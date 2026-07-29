@@ -103,11 +103,11 @@ export default function StudentsClient({ students, totalGates }: Props) {
     doc.setFont('Helvetica', 'bold')
     doc.setFontSize(14)
     doc.text('CIT PASSPORT PASSENGER IMMIGRATION MANIFEST', 14, 15)
-    
+
     doc.setFont('Helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(`Total Records: ${filteredStudents.length} | Generated: ${new Date().toLocaleString()}`, 14, 21)
-    
+
     let y = 32
     doc.setFont('Helvetica', 'bold')
     doc.text('Passenger Name', 14, y)
@@ -126,7 +126,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
       }
       doc.text(s.full_name.toUpperCase().substring(0, 28), 14, y)
       doc.text(s.student_id || 'PENDING', 75, y)
-      
+
       const courseShort = s.course.split(' ').map(w => w[0]).join('').toUpperCase()
       doc.text(`${courseShort} ${s.section}`, 115, y)
       doc.text(`${s.stampsCount}/${totalGates}`, 165, y)
@@ -141,7 +141,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
       <AdminNavbar />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex-1 w-full space-y-6">
-        
+
         {/* Page Header */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-5">
           <div>
@@ -181,7 +181,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
 
         {/* SEARCH & FILTERS PANEL */}
         <section className="glass-panel-dark rounded-2xl p-5 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-          
+
           {/* Search box */}
           <div className="md:col-span-2 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -245,7 +245,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
               <tbody className="divide-y divide-slate-900 text-xs">
                 {filteredStudents.map((stud) => (
                   <tr key={stud.id} className="hover:bg-slate-900/35 transition-colors">
-                    
+
                     {/* Passenger details */}
                     <td className="py-4 px-6 flex items-center gap-3">
                       {stud.avatar_url ? (
@@ -275,11 +275,10 @@ export default function StudentsClient({ students, totalGates }: Props) {
 
                     {/* Stamp Count */}
                     <td className="py-4 px-6 text-center">
-                      <span className={`inline-block px-2.5 py-1 text-[10px] font-bold rounded-lg font-mono tracking-wider ${
-                        stud.stampsCount === totalGates
+                      <span className={`inline-block px-2.5 py-1 text-[10px] font-bold rounded-lg font-mono tracking-wider ${stud.stampsCount === totalGates
                           ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/20'
                           : 'bg-[#0E1B30] text-[#60A5FA] border border-slate-800'
-                      }`}>
+                        }`}>
                         {stud.stampsCount} / {totalGates} GATES
                       </span>
                     </td>
@@ -331,7 +330,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
               exit={{ scale: 0.9, y: 30 }}
               className="max-w-lg w-full bg-[#08111F] border border-slate-850 rounded-3xl overflow-hidden shadow-2xl relative"
             >
-              
+
               {/* Modal header */}
               <div className="bg-[#040912] border-b border-slate-850 px-6 py-4 flex justify-between items-center">
                 <div>

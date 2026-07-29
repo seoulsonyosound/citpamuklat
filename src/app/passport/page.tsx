@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PassportClient from './PassportClient'
+import { OFFICIAL_PAMUKLAT_STOPS } from '@/lib/pamuklatStops'
 
 export default async function PassportPage() {
   const supabase = await createClient()
@@ -34,6 +35,11 @@ export default async function PassportPage() {
     .eq('status', 'active')
     .order('created_at', { ascending: true })
 
+  // Use DB destinations if available, otherwise fall back to 8 official Pamuklat stops
+  const activeDestinations = (destinations && destinations.length > 0)
+    ? destinations
+    : OFFICIAL_PAMUKLAT_STOPS
+
   // 4. Get completions (to show ink stamps)
   const { data: completions } = await supabase
     .from('student_destinations')
@@ -43,7 +49,7 @@ export default async function PassportPage() {
   return (
     <PassportClient
       profile={profile}
-      destinations={destinations || []}
+      destinations={activeDestinations as any}
       completions={completions || []}
     />
   )

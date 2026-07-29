@@ -16,6 +16,13 @@ export default async function DestinationPage({ params }: Props) {
     redirect('/login')
   }
 
+  // Fetch student profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
   // 2. Fetch specific destination details
   const { data: destination } = await supabase
     .from('destinations')
@@ -37,6 +44,7 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <DestinationDetailsClient
+      profile={profile}
       destination={destination}
       isCompleted={!!completion}
       completionDate={completion ? completion.completion_date : null}

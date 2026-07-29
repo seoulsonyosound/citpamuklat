@@ -26,7 +26,7 @@ export default function AdminNavbar() {
   return (
     <header className="w-full bg-[#040912]/95 border-b border-amber-500/10 backdrop-blur-md sticky top-0 z-45 px-4 md:px-8 py-3.5">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        
+
         {/* Brand logo */}
         <Link href="/admin/dashboard" className="flex items-center gap-2 cursor-pointer group">
           <div className="bg-amber-500/10 border border-amber-500/20 p-2 rounded-xl text-amber-400">
@@ -51,11 +51,10 @@ export default function AdminNavbar() {
             return (
               <Link key={link.href} href={link.href}>
                 <div
-                  className={`relative flex items-center gap-2 px-3 md:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                    isActive
+                  className={`relative flex items-center gap-2 px-3 md:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${isActive
                       ? 'text-white'
                       : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   {isActive && (
                     <motion.div

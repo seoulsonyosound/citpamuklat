@@ -93,7 +93,7 @@ export async function completeOnboardingAction(data: {
   await supabase.from('notifications').insert({
     user_id: user.id,
     user_role: 'student',
-    title: 'Passport Issued ✈️',
+    title: 'Passport Issued',
     message: 'Welcome onboard! Your CIT Digital Passport has been issued. Complete destinations to collect stamps.',
   })
 

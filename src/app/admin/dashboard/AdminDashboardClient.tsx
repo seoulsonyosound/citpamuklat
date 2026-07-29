@@ -60,7 +60,7 @@ export default function AdminDashboardClient({
       <AdminNavbar />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex-1 w-full space-y-8">
-        
+
         {/* Control Header */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-5">
           <div>
@@ -77,7 +77,7 @@ export default function AdminDashboardClient({
               Terminal 1 traffic analysis, immigration gate validations, and passenger rosters.
             </p>
           </div>
-          
+
           <div className="bg-[#040912]/80 border border-slate-800 rounded-xl px-4 py-2 text-[10px] font-mono uppercase text-slate-400">
             System Clock: <strong className="text-white">{new Date().toLocaleTimeString()}</strong>
           </div>
@@ -144,10 +144,10 @@ export default function AdminDashboardClient({
 
         {/* TWO COLUMN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* COLUMN 1 & 2: Popular Gates and Passenger Manifest */}
           <div className="lg:col-span-2 space-y-8">
-            
+
             {/* GATE COMPLETION RATES CHART */}
             <div className="glass-panel-dark rounded-3xl p-6 shadow-xl space-y-6">
               <div>
@@ -174,12 +174,12 @@ export default function AdminDashboardClient({
                           {gate.completions} Stamped ({percent}%)
                         </span>
                       </div>
-                      
+
                       {/* Bar fill */}
                       <div className="h-3 w-full bg-slate-900/60 rounded-full overflow-hidden border border-slate-900">
-                        <div 
+                        <div
                           className="h-full rounded-full transition-all duration-1000 shadow-inner"
-                          style={{ 
+                          style={{
                             width: `${percent}%`,
                             backgroundColor: gate.color
                           }}

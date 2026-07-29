@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DashboardClient from './DashboardClient'
+import { OFFICIAL_PAMUKLAT_STOPS } from '@/lib/pamuklatStops'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -34,6 +35,11 @@ export default async function DashboardPage() {
     .eq('status', 'active')
     .order('created_at', { ascending: true })
 
+  // Use DB destinations if available, otherwise fall back to 8 official Pamuklat stops
+  const activeDestinations = (destinations && destinations.length > 0)
+    ? destinations
+    : OFFICIAL_PAMUKLAT_STOPS
+
   // 4. Get student completions
   const { data: completions } = await supabase
     .from('student_destinations')
@@ -51,7 +57,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       profile={profile}
-      initialDestinations={destinations || []}
+      initialDestinations={activeDestinations as any}
       initialCompletions={completions || []}
       initialNotifications={notifications || []}
     />

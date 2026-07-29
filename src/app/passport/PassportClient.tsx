@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plane, User, ShieldCheck, ArrowRight, ArrowLeft, BookOpen, Star, HelpCircle } from 'lucide-react'
+import { Plane, User, ShieldCheck, ArrowRight, ArrowLeft, BookOpen, Star, HelpCircle, Bookmark } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
 interface Profile {
@@ -47,7 +47,7 @@ export default function PassportClient({ profile, destinations, completions }: P
     const formattedName = profile.full_name.replace(/\s+/g, '<').toUpperCase()
     const courseCode = profile.course.split(' ').map(w => w[0]).join('').toUpperCase()
     const cleanId = (profile.student_id || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
-    
+
     return (
       <div className="font-mono text-[9px] text-[#4A3728]/70 leading-none tracking-widest uppercase border-t border-[#4A3728]/15 pt-3.5 mt-3 select-none">
         <div>P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
@@ -68,23 +68,32 @@ export default function PassportClient({ profile, destinations, completions }: P
   }
 
   return (
-    <div className="min-h-screen bg-[#08111F] text-slate-100 flex flex-col pb-12">
+    <div className="min-h-screen bg-[#F5F7FB] text-[#0F1D36] flex flex-col pb-12 relative overflow-hidden">
+      {/* Background Floating Travel Shapes */}
+      <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-[#1E4FCC]/5 rounded-full blur-3xl pointer-events-none bg-shape-float" />
+      <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-[#3B82F6]/10 rounded-full blur-3xl pointer-events-none bg-shape-float-delay" />
+
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-4 md:px-8 py-10 flex-1 w-full flex flex-col items-center justify-center space-y-8">
-        
+      <main className="max-w-4xl mx-auto px-4 md:px-8 py-10 flex-1 w-full flex flex-col items-center justify-center space-y-8 relative z-10">
+
         {/* Page Header */}
-        <div className="text-center">
-          <span className="text-xs uppercase tracking-[0.25em] text-[#60A5FA] font-bold">
-            Electronic Passport Booklet
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <span className="text-xs uppercase tracking-[0.25em] text-[#2B7574] font-extrabold flex items-center justify-center gap-1.5 mb-1">
+            <Plane className="h-4 w-4 text-[#2B7574]" /> Electronic Passport Booklet
           </span>
-          <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1">
-            MY DIGITAL PASSPORT
+          <h2 className="text-3xl font-black text-[#0F1D36] tracking-tight">
+            MY DIGITAL CAMPUS PASSPORT
           </h2>
-          <p className="text-xs text-slate-400 mt-2 max-w-sm mx-auto leading-relaxed">
-            Click the passport cover to flip it open and browse your cleared visa immigration stamps.
+          <p className="text-xs text-[#5A6B85] mt-2 max-w-sm mx-auto leading-relaxed font-medium">
+            Click the passport cover below to flip open your booklet and view your collected Pamuklat clearance stamps.
           </p>
-        </div>
+        </motion.div>
 
         {/* PASSPORT BOOKLET FRAME CONTAINER */}
         <div className="relative w-full max-w-[700px] flex items-center justify-center min-h-[460px]">
@@ -93,15 +102,15 @@ export default function PassportClient({ profile, destinations, completions }: P
               /* PASSPORT COVER PAGE */
               <motion.div
                 key="passport-cover"
-                initial={{ rotateY: -90, opacity: 0 }}
-                animate={{ rotateY: 0, opacity: 1 }}
-                exit={{ rotateY: 90, opacity: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="w-full max-w-[340px] aspect-[1/1.42] passport-cover-bg rounded-2xl p-8 flex flex-col justify-between items-center text-center shadow-2xl relative border-2 border-slate-700/30 cursor-pointer select-none"
+                initial={{ rotateY: -90, opacity: 0, scale: 0.95 }}
+                animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                exit={{ rotateY: 90, opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="w-full max-w-[340px] aspect-[1/1.42] passport-cover-bg rounded-3xl p-8 flex flex-col justify-between items-center text-center shadow-2xl relative border-2 border-slate-700/30 cursor-pointer select-none group transform hover:scale-[1.02] transition-transform duration-300"
                 onClick={() => setIsOpen(true)}
               >
                 {/* Embossed gold/silver outer shine */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 rounded-2xl pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 rounded-3xl pointer-events-none" />
 
                 <div className="space-y-2">
                   <span className="text-[8px] tracking-[0.35em] text-slate-300 font-extrabold uppercase block leading-none">
@@ -114,7 +123,7 @@ export default function PassportClient({ profile, destinations, completions }: P
 
                 <div className="my-auto space-y-8 flex flex-col items-center">
                   {/* Metallic stamped crest circle */}
-                  <div className="w-24 h-24 rounded-full border-4 border-[#C2C9D6]/40 bg-gradient-to-br from-[#E2E8F0]/10 to-[#94A3B8]/20 flex items-center justify-center relative shadow-lg">
+                  <div className="w-24 h-24 rounded-full border-4 border-[#C2C9D6]/40 bg-gradient-to-br from-[#E2E8F0]/10 to-[#94A3B8]/20 flex items-center justify-center relative shadow-lg bg-shape-spin">
                     <Plane className="h-10 w-10 text-[#C2C9D6] transform -rotate-45" />
                     <div className="absolute inset-2 rounded-full border border-dashed border-[#C2C9D6]/30" />
                   </div>
@@ -136,8 +145,8 @@ export default function PassportClient({ profile, destinations, completions }: P
                     <div className="h-2 w-2 rounded-full bg-[#C2C9D6]/40 mx-auto" />
                     <div className="h-0.5 bg-[#C2C9D6]/40 w-full" />
                   </div>
-                  
-                  <button className="flex items-center gap-1.5 mx-auto bg-white/10 hover:bg-white/20 text-white font-bold text-[9px] uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-white/10 cursor-pointer">
+
+                  <button className="flex items-center gap-1.5 mx-auto bg-white/15 hover:bg-white/25 text-white font-extrabold text-[9px] uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all border border-white/20 cursor-pointer shadow-md group-hover:translate-x-1">
                     Open Passport <ArrowRight className="h-3 w-3" />
                   </button>
                 </div>
@@ -146,11 +155,11 @@ export default function PassportClient({ profile, destinations, completions }: P
               /* PASSPORT INSIDE PAGES SPREAD (TWO COLUMNS) */
               <motion.div
                 key="passport-inner"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full flex flex-col md:flex-row items-stretch rounded-2xl overflow-hidden shadow-2xl relative border-2 border-slate-700/40"
+                initial={{ scale: 0.9, opacity: 0, rotateY: 90 }}
+                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                exit={{ scale: 0.9, opacity: 0, rotateY: -90 }}
+                transition={{ duration: 0.6 }}
+                className="w-full flex flex-col md:flex-row items-stretch rounded-3xl overflow-hidden shadow-2xl relative border-2 border-slate-400/40"
               >
                 {/* Central booklet shadow spine */}
                 <div className="absolute top-0 bottom-0 left-1/2 w-8 bg-gradient-to-r from-black/20 via-transparent to-black/20 transform -translate-x-1/2 pointer-events-none hidden md:block z-20" />
@@ -246,11 +255,11 @@ export default function PassportClient({ profile, destinations, completions }: P
 
                 {/* RIGHT PAGE: Visa Immigration Stamps Book */}
                 <div className="w-full md:w-1/2 p-6 md:p-8 passport-inner-bg text-[#4A3728] flex flex-col justify-between relative min-h-[380px]">
-                  
+
                   {/* Visas Title */}
                   <div className="flex justify-between items-center border-b border-[#4A3728]/15 pb-3">
-                    <span className="text-[10px] font-black text-indigo-950 tracking-wider uppercase">
-                      Visas & Entry Arrivals
+                    <span className="text-[10px] font-black text-indigo-950 tracking-wider uppercase flex items-center gap-1">
+                      <Bookmark className="h-3.5 w-3.5 text-[#2B7574]" /> Pamuklat Clearance Stamps
                     </span>
                     <span className="text-[7px] uppercase tracking-widest text-[#78614E] font-bold">
                       Page 03
@@ -258,13 +267,12 @@ export default function PassportClient({ profile, destinations, completions }: P
                   </div>
 
                   {/* Visa Stamps Grid */}
-                  <div className="grid grid-cols-2 gap-4 my-auto py-4">
+                  <div className="grid grid-cols-2 gap-3.5 my-auto py-4">
                     {destinations.map((dest, index) => {
                       const isStamped = completedIds.includes(dest.id)
                       const stampDate = getStampCompletionDate(dest.id)
 
-                      // Deterministic stamp rotation and colors based on index/ID to keep rendering stable
-                      const rotations = ['-rotate-6', 'rotate-12', '-rotate-12', 'rotate-6', 'rotate-3', '-rotate-3']
+                      const rotations = ['-rotate-6', 'rotate-6', '-rotate-12', 'rotate-12', 'rotate-3', '-rotate-3']
                       const rotationClass = rotations[index % rotations.length]
 
                       return (
@@ -272,7 +280,7 @@ export default function PassportClient({ profile, destinations, completions }: P
                           key={dest.id}
                           className="relative flex flex-col items-center justify-center border border-[#4A3728]/10 bg-slate-350/[0.02] rounded-xl aspect-[1.25/1] p-2 relative shadow-inner overflow-hidden select-none"
                         >
-                          <span className="absolute top-1 left-1.5 text-[6.5px] text-slate-400 font-mono">
+                          <span className="absolute top-1 left-1.5 text-[6.5px] text-slate-400 font-mono font-bold">
                             GATE {dest.gate_number.replace('GATE', '').trim()}
                           </span>
 

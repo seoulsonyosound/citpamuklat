@@ -54,7 +54,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
   const onSubmit = async (values: OnboardingValues) => {
     setServerError(null)
     setIssuing(true)
-    
+
     try {
       const result = await completeOnboardingAction(values)
       if (result.error) {
@@ -79,7 +79,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
     const formattedName = fullName.replace(/\s+/g, '<').toUpperCase()
     const formattedCourse = (watchCourse || 'CIT').split(' ').map(w => w[0]).join('').toUpperCase()
     const cleanId = (watchStudentId || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
-    
+
     return (
       <div className="font-mono text-[9px] text-[#A78BFA] leading-none tracking-widest uppercase mt-4 border-t border-[#A78BFA]/10 pt-3">
         <div>P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
@@ -96,7 +96,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
 
       {/* Main Container */}
       <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-stretch mt-4 mb-4">
-        
+
         {/* LEFT COLUMN: Passport Control Clearance Terminal */}
         <div className="w-full md:w-1/2 flex flex-col justify-center">
           <div className="mb-6">

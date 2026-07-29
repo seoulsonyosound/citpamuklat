@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "✈️ CIT Freshmen Digital Passport | University of the Assumption",
+  title: "CIT Freshmen Digital Passport | University of the Assumption",
   description: "Your first journey through CIT. Complete campus destinations, collect digital stamps, and unlock your clearance boarding passes.",
 };
 

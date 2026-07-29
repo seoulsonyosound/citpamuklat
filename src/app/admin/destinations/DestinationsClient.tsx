@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, MapPin, ToggleLeft, ToggleRight, QrCode, X, Save, Clock, Compass, HelpCircle } from 'lucide-react'
+import { Plus, Edit2, Trash2, MapPin, ToggleLeft, ToggleRight, QrCode, X, Save, Clock, Compass, HelpCircle, ShieldAlert } from 'lucide-react'
 import AdminNavbar from '@/components/AdminNavbar'
 import { saveDestinationAction, deleteDestinationAction, regenerateQRAction } from '@/app/actions/destinationActions'
 import * as Icons from 'lucide-react'
@@ -29,7 +29,7 @@ interface Props {
 export default function DestinationsClient({ initialDestinations }: Props) {
   const [destinations, setDestinations] = useState<Destination[]>(initialDestinations)
   const [editingDest, setEditingDest] = useState<Partial<Destination> | null>(null)
-  
+
   // QR Code Modal states
   const [showQRModal, setShowQRModal] = useState<boolean>(false)
   const [qrToken, setQrToken] = useState<string | null>(null)
@@ -107,7 +107,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
           setQrCodeUrl(dataUrl)
           setShowQRModal(true)
         }
-        
+
         // Reload list client side (simplified by page refresh trigger)
         window.location.reload()
       }
@@ -122,7 +122,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   // Handle Delete
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this gate destination? This action is permanent and clears completions records.')) return
-    
+
     const result = await deleteDestinationAction(id)
     if (result.error) {
       alert(result.error)
@@ -134,7 +134,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   // Handle QR Regeneration
   const handleRegenerateQR = async (dest: Destination) => {
     if (!confirm(`Regenerating QR code for ${dest.title} invalidates the previous QR. Representatives must print the new QR immediately. Proceed?`)) return
-    
+
     try {
       const result = await regenerateQRAction(dest.id)
       if (result.error) {
@@ -161,7 +161,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       <AdminNavbar />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex-1 w-full space-y-6">
-        
+
         {/* Page Header */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-5">
           <div>
@@ -207,11 +207,10 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                   </div>
                 </div>
 
-                <span className={`px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded border ${
-                  dest.status === 'active'
+                <span className={`px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded border ${dest.status === 'active'
                     ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
                     : 'bg-slate-950 text-slate-500 border-slate-800'
-                }`}>
+                  }`}>
                   {dest.status}
                 </span>
               </div>
@@ -285,7 +284,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
               transition={{ type: 'spring', damping: 20 }}
               className="w-full max-w-lg bg-[#08111F] border-l border-slate-850 h-full p-6 md:p-8 flex flex-col justify-between shadow-2xl relative"
             >
-              
+
               {/* Drawer header */}
               <div className="flex justify-between items-center border-b border-slate-850 pb-4 mb-6">
                 <div>
@@ -306,7 +305,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
 
               {/* Form elements scrolling wrapper */}
               <form onSubmit={handleSave} className="flex-1 overflow-y-auto pr-1 space-y-4 pb-6">
-                
+
                 {/* Title */}
                 <div className="space-y-1.5">
                   <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
@@ -521,14 +520,14 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                 <div className="text-[10px] text-slate-500 leading-normal max-w-xs mx-auto">
                   Representatives display this QR code at their activity booth. Freshmen scan this to stamp their passports.
                 </div>
-                
+
                 {/* Security Token alert */}
                 <div className="text-[9px] font-mono text-amber-500 border border-amber-500/15 bg-amber-950/20 py-2.5 px-3 rounded-xl break-all">
                   Token: {qrToken?.substring(0, 32)}...
                 </div>
 
-                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">
-                  ⚠️ NOT STORED IN DATABASE UNENCRYPTED
+                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest flex items-center justify-center gap-1">
+                  <ShieldAlert className="h-3 w-3 text-amber-500" /> NOT STORED IN DATABASE UNENCRYPTED
                 </div>
               </div>
 

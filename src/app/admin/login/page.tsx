@@ -2,7 +2,7 @@
 
 import React, { useActionState, startTransition } from 'react'
 import { motion } from 'framer-motion'
-import { ShieldCheck, Lock, User, Plane, AlertTriangle, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Lock, User, Plane, AlertTriangle, ArrowRight, Ticket } from 'lucide-react'
 import { adminLoginAction } from '@/app/actions/authActions'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
 
       {/* Main access block */}
       <div className="w-full max-w-md my-auto">
-        
+
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8 text-center space-y-3">
           <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-400 shadow-lg shadow-amber-500/5">
@@ -133,9 +133,9 @@ export default function AdminLoginPage() {
       <div className="mt-8 text-center z-10">
         <Link
           href="/login"
-          className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-[#60A5FA] transition-colors uppercase tracking-widest border-b border-transparent hover:border-[#60A5FA]/40 font-mono pb-0.5"
+          className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-[#12484C] transition-colors uppercase tracking-widest border-b border-transparent hover:border-[#12484C]/40 font-mono pb-0.5"
         >
-          🎫 Return to Passenger Kiosk (Check-In)
+          <Ticket className="h-3.5 w-3.5 text-[#2B7574]" /> Return to Passenger Kiosk (Check-In)
         </Link>
       </div>
     </div>

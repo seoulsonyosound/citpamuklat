@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { verifyAdminToken } from '@/lib/adminAuth'
 import { createServiceRoleClient } from '@/lib/supabase/serviceRole'
 import DestinationsClient from './DestinationsClient'
+import { OFFICIAL_PAMUKLAT_STOPS } from '@/lib/pamuklatStops'
 
 export default async function AdminDestinationsPage() {
   // 1. Verify admin token
@@ -22,9 +23,13 @@ export default async function AdminDestinationsPage() {
     .select('*')
     .order('created_at', { ascending: false })
 
+  const initialDestinations = (destinations && destinations.length > 0)
+    ? destinations
+    : OFFICIAL_PAMUKLAT_STOPS
+
   return (
     <DestinationsClient
-      initialDestinations={destinations || []}
+      initialDestinations={initialDestinations as any}
     />
   )
 }
