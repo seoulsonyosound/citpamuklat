@@ -68,25 +68,73 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   const [formStampImage, setFormStampImage] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImageFile = (file: File, maxWidth = 800, maxHeight = 800, quality = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width)
+              width = maxWidth
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height)
+              height = maxHeight
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            resolve(e.target?.result as string)
+            return
+          }
+
+          ctx.drawImage(img, 0, 0, width, height)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+          resolve(compressedDataUrl)
+        }
+        img.onerror = () => reject(new Error('Failed to load image for compression'))
+        img.src = e.target?.result as string
+      }
+      reader.onerror = () => reject(new Error('Failed to read image file'))
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         setAlertModal({
           isOpen: true,
           title: 'File Too Large',
-          message: 'Please select an image smaller than 5MB.',
+          message: 'Please select an image smaller than 10MB.',
           isError: true,
         })
         return
       }
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setFormStampImage(event.target.result as string)
+      try {
+        const compressed = await compressImageFile(file)
+        setFormStampImage(compressed)
+      } catch (err) {
+        console.error('Compression failed, falling back to raw data URL:', err)
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            setFormStampImage(event.target.result as string)
+          }
         }
+        reader.readAsDataURL(file)
       }
-      reader.readAsDataURL(file)
     }
   }
 
