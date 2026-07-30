@@ -93,14 +93,14 @@ export default function PassportClient({ profile, destinations, completions }: P
   }
 
   const generateMRZ = () => {
-    const formattedName = profile.full_name.replace(/\s+/g, '<').toUpperCase()
-    const courseCode = profile.course.split(' ').map(w => w[0]).join('').toUpperCase()
-    const cleanId = (profile.student_id || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
+    const formattedName = (profile?.full_name || 'STUDENT').replace(/\s+/g, '<').toUpperCase()
+    const courseCode = profile?.course ? profile.course.split(' ').map(w => w[0]).join('').toUpperCase() : 'CIT'
+    const cleanId = (profile?.student_id || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
 
     return (
       <div className="font-mono text-[9.5px] text-[#2D1F15] font-extrabold leading-none tracking-widest uppercase border-t border-[#4A3728]/25 pt-3.5 mt-3 select-none">
         <div>P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-        <div>{cleanId}PHL{courseCode}&lt;{profile.section}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+        <div>{cleanId}PHL{courseCode}&lt;{profile?.section || '1-A'}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
       </div>
     )
   }

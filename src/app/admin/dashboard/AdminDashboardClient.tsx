@@ -213,10 +213,10 @@ export default function AdminDashboardClient({
                   <div key={stud.id} className="flex items-center justify-between pt-4 first:pt-0">
                     <div className="flex items-center gap-3">
                       <div className="h-8.5 w-8.5 rounded-full bg-[#052856]/10 text-[#052856] flex items-center justify-center font-bold text-xs uppercase border border-[#052856]/20">
-                        {stud.full_name[0]}
+                        {stud.full_name ? stud.full_name[0] : 'U'}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-[#0F1D36]">{stud.full_name.toUpperCase()}</div>
+                        <div className="text-xs font-bold text-[#0F1D36]">{(stud.full_name || 'STUDENT').toUpperCase()}</div>
                         <div className="text-[9px] font-mono text-[#64748B] font-bold uppercase mt-0.5">
                           {stud.course ? stud.course.split(' ')[0] : 'Freshman'} | SECTION {stud.section || 'TBD'}
                         </div>
@@ -226,7 +226,7 @@ export default function AdminDashboardClient({
                     <div className="text-right text-[10px] font-mono text-[#475569] font-bold">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3 text-[#64748B]" />
-                        {new Date(stud.registration_date).toLocaleDateString()}
+                        {stud.registration_date ? new Date(stud.registration_date).toLocaleDateString() : 'N/A'}
                       </div>
                     </div>
                   </div>

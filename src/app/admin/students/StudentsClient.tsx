@@ -42,15 +42,22 @@ export default function StudentsClient({ students, totalGates }: Props) {
 
   // Filter students based on search term and selectors
   const filteredStudents = students.filter((s) => {
-    const matchesSearch =
-      s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (s.student_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.section.toLowerCase().includes(searchTerm.toLowerCase())
+    const name = s.full_name || ''
+    const email = s.email || ''
+    const studentId = s.student_id || ''
+    const course = s.course || ''
+    const section = s.section || ''
+    const yearLevel = s.year_level || ''
 
-    const matchesCourse = courseFilter === 'All' || s.course.includes(courseFilter)
-    const matchesYear = yearFilter === 'All' || s.year_level === yearFilter
+    const matchesSearch =
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      section.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesCourse = courseFilter === 'All' || course.includes(courseFilter)
+    const matchesYear = yearFilter === 'All' || yearLevel === yearFilter
 
     return matchesSearch && matchesCourse && matchesYear
   })
@@ -58,14 +65,14 @@ export default function StudentsClient({ students, totalGates }: Props) {
   // EXPORT EXCEL ACTION
   const handleExportExcel = () => {
     const data = filteredStudents.map((s) => ({
-      'Full Name': s.full_name.toUpperCase(),
-      'Email Address': s.email,
+      'Full Name': (s.full_name || 'STUDENT').toUpperCase(),
+      'Email Address': s.email || '',
       'Student ID': s.student_id || 'PENDING',
-      'Course': s.course,
-      'Section': s.section,
-      'Year Level': s.year_level,
-      'Stamps Collected': `${s.stampsCount}/${totalGates}`,
-      'Registration Date': new Date(s.registration_date).toLocaleDateString(),
+      'Course': s.course || 'N/A',
+      'Section': s.section || 'N/A',
+      'Year Level': s.year_level || 'N/A',
+      'Stamps Collected': `${s.stampsCount || 0}/${totalGates}`,
+      'Registration Date': s.registration_date ? new Date(s.registration_date).toLocaleDateString() : 'N/A',
     }))
 
     const worksheet = XLSX.utils.json_to_sheet(data)
@@ -78,14 +85,14 @@ export default function StudentsClient({ students, totalGates }: Props) {
   const handleExportCSV = () => {
     const headers = ['Full Name', 'Email', 'Student ID', 'Course', 'Section', 'Year Level', 'Stamps', 'Registration Date']
     const rows = filteredStudents.map((s) => [
-      `"${s.full_name.toUpperCase()}"`,
-      `"${s.email}"`,
+      `"${(s.full_name || 'STUDENT').toUpperCase()}"`,
+      `"${s.email || ''}"`,
       `"${s.student_id || 'PENDING'}"`,
-      `"${s.course}"`,
-      `"${s.section}"`,
-      `"${s.year_level}"`,
-      `"${s.stampsCount}/${totalGates}"`,
-      `"${new Date(s.registration_date).toLocaleDateString()}"`,
+      `"${s.course || 'N/A'}"`,
+      `"${s.section || 'N/A'}"`,
+      `"${s.year_level || 'N/A'}"`,
+      `"${s.stampsCount || 0}/${totalGates}"`,
+      `"${s.registration_date ? new Date(s.registration_date).toLocaleDateString() : 'N/A'}"`,
     ])
 
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
@@ -124,12 +131,13 @@ export default function StudentsClient({ students, totalGates }: Props) {
         doc.addPage()
         y = 20
       }
-      doc.text(s.full_name.toUpperCase().substring(0, 28), 14, y)
+      doc.text((s.full_name || 'STUDENT').toUpperCase().substring(0, 28), 14, y)
       doc.text(s.student_id || 'PENDING', 75, y)
 
-      const courseShort = s.course.split(' ').map(w => w[0]).join('').toUpperCase()
-      doc.text(`${courseShort} ${s.section}`, 115, y)
-      doc.text(`${s.stampsCount}/${totalGates}`, 165, y)
+      const courseShort = s.course ? s.course.split(' ').map(w => w[0]).join('').toUpperCase() : 'N/A'
+      const sectionStr = s.section || 'N/A'
+      doc.text(`${courseShort} ${sectionStr}`, 115, y)
+      doc.text(`${s.stampsCount || 0}/${totalGates}`, 165, y)
       y += 8
     })
 
@@ -253,12 +261,12 @@ export default function StudentsClient({ students, totalGates }: Props) {
                         <img src={stud.avatar_url} alt="" className="h-8.5 w-8.5 rounded-full object-cover border border-[#CBD5E1]" />
                       ) : (
                         <div className="h-8.5 w-8.5 rounded-full bg-[#052856]/10 text-[#052856] flex items-center justify-center font-bold text-xs uppercase border border-[#052856]/20">
-                          {stud.full_name[0]}
+                          {stud.full_name ? stud.full_name[0] : 'U'}
                         </div>
                       )}
                       <div>
-                        <div className="font-extrabold text-[#0F1D36] uppercase tracking-wide">{stud.full_name}</div>
-                        <div className="text-[10px] text-[#64748B] font-mono font-bold mt-0.5">{stud.email}</div>
+                        <div className="font-extrabold text-[#0F1D36] uppercase tracking-wide">{stud.full_name || 'STUDENT'}</div>
+                        <div className="text-[10px] text-[#64748B] font-mono font-bold mt-0.5">{stud.email || ''}</div>
                       </div>
                     </td>
 
@@ -269,8 +277,12 @@ export default function StudentsClient({ students, totalGates }: Props) {
 
                     {/* Course */}
                     <td className="py-4 px-6">
-                      <div className="font-extrabold text-[#0F1D36] uppercase">{stud.course.split(' ').map(w => w[0]).join('').toUpperCase()}</div>
-                      <div className="text-[10px] text-[#64748B] uppercase font-mono font-bold mt-0.5">Section {stud.section}</div>
+                      <div className="font-extrabold text-[#0F1D36] uppercase">
+                        {stud.course ? stud.course.split(' ').map(w => w[0]).join('').toUpperCase() : 'PENDING'}
+                      </div>
+                      <div className="text-[10px] text-[#64748B] uppercase font-mono font-bold mt-0.5">
+                        Section {stud.section || 'TBD'}
+                      </div>
                     </td>
 
                     {/* Stamp Count */}
@@ -279,13 +291,13 @@ export default function StudentsClient({ students, totalGates }: Props) {
                           ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                           : 'bg-[#F1F5F9] text-[#1E4FCC] border border-[#CBD5E1]'
                         }`}>
-                        {stud.stampsCount} / {totalGates} GATES
+                        {stud.stampsCount || 0} / {totalGates} GATES
                       </span>
                     </td>
 
                     {/* Date */}
                     <td className="py-4 px-6 font-mono text-[#475569] font-bold">
-                      {new Date(stud.registration_date).toLocaleDateString()}
+                      {stud.registration_date ? new Date(stud.registration_date).toLocaleDateString() : 'N/A'}
                     </td>
 
                     {/* Action audit */}
