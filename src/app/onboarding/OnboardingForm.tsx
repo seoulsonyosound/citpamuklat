@@ -28,14 +28,6 @@ const SECTION_OPTIONS = [
   '1-A',
   '1-B',
   '1-C',
-  '2-A',
-  '2-B',
-  '2-C',
-  '3-A',
-  '3-B',
-  '3-C',
-  '4-A',
-  '4-B',
 ]
 
 export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
@@ -319,10 +311,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
                       {...register('yearLevel')}
                       className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] focus:ring-1 focus:ring-[#052856] text-[#0F1D36] font-semibold rounded-xl py-3 pl-10 pr-4 outline-none text-sm transition-all appearance-none cursor-pointer"
                     >
-                      <option value="1st Year">1st Year (Freshman)</option>
-                      <option value="2nd Year">2nd Year (Sophomore)</option>
-                      <option value="3rd Year">3rd Year (Junior)</option>
-                      <option value="4th Year">4th Year (Senior)</option>
+                      <option value="1st Year">1st Year (Freshmen)</option>
                     </select>
                   </div>
                   {errors.yearLevel && (

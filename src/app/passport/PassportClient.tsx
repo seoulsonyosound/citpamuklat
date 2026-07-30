@@ -50,6 +50,7 @@ export default function PassportClient({ profile, destinations, completions }: P
     setDownloading(true)
 
     try {
+      // @ts-ignore
       const { toPng } = await import('html-to-image')
       const dataUrl = await toPng(passportRef.current, {
         cacheBust: true,
