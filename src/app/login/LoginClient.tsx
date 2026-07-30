@@ -70,6 +70,10 @@ export default function LoginClient() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          hd: 'ua.edu.ph',
+          prompt: 'select_account',
+        },
       },
     })
     if (error) {
@@ -177,7 +181,7 @@ export default function LoginClient() {
                 <h2 className="text-2xl font-black text-[#052856] tracking-tight mb-2 uppercase">
                   Self Check-In Terminal
                 </h2>
-                <p className="text-xs text-[#5A6B85] max-w-xs mx-auto leading-relaxed">
+                <p className="text-xs text-[#2D3748] font-medium max-w-xs mx-auto leading-relaxed">
                   Sign in with your Google student account to claim your Digital Passport booklet and track your 8 Pamuklat stamps.
                 </p>
               </div>
@@ -189,23 +193,23 @@ export default function LoginClient() {
                   animate={{ scale: 1 }}
                   className={`mb-6 p-4 rounded-2xl border text-xs flex gap-3 items-start ${
                     errorType === 'domain'
-                      ? 'bg-[#861211]/10 text-[#861211] border-[#861211]/30'
-                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                      ? 'bg-[#861211]/10 text-[#861211] border-[#861211]/30 font-semibold'
+                      : 'bg-amber-50 text-amber-900 border-amber-300 font-semibold'
                   }`}
                 >
                   {errorType === 'domain' ? (
                     <>
                       <ShieldAlert className="h-5 w-5 text-[#861211] shrink-0 mt-0.5" />
                       <div>
-                        <strong className="font-semibold block mb-1">Access Restricted</strong>
-                        Only Google student email addresses ending with <strong>@student.ua.edu.ph</strong> are permitted to board.
+                        <strong className="font-bold block mb-1">Access Restricted</strong>
+                        Only Google email addresses ending with <strong>@ua.edu.ph</strong> (e.g. <strong>@student.ua.edu.ph</strong>) are permitted to board.
                       </div>
                     </>
                   ) : (
                     <>
-                      <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                      <ShieldAlert className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="font-semibold block mb-1">Boarding Warning</strong>
+                        <strong className="font-bold block mb-1">Boarding Warning</strong>
                         Authentication process failed. Please ensure your internet connection is active and try scanning again.
                       </div>
                     </>
@@ -242,14 +246,14 @@ export default function LoginClient() {
                         />
                       </svg>
                     </div>
-                    <span className="tracking-wide text-xs font-extrabold uppercase text-left block">
+                    <span className="tracking-wide text-xs font-black uppercase text-left block text-white">
                       {loading ? 'Initializing check-in...' : 'Google Student Check-In'}
                     </span>
                   </div>
                   <ArrowRight className="h-5 w-5 text-white/90 group-hover:translate-x-1.5 transition-transform shrink-0" />
                 </button>
 
-                <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#5A6B85] uppercase tracking-widest font-bold mt-4">
+                <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#2D3748] uppercase tracking-widest font-black mt-4">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#052856]" />
                   Verified Student OAuth Security
                 </div>

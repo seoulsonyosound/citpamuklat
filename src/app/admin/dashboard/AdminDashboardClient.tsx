@@ -73,12 +73,12 @@ export default function AdminDashboardClient({
             <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1">
               ANALYTICS TOWER
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-300 font-medium">
               Terminal 1 traffic analysis, immigration gate validations, and passenger rosters.
             </p>
           </div>
 
-          <div className="bg-[#040912]/80 border border-slate-800 rounded-xl px-4 py-2 text-[10px] font-mono uppercase text-slate-400">
+          <div className="bg-[#040912]/80 border border-slate-800 rounded-xl px-4 py-2 text-[10px] font-mono uppercase text-slate-300 font-bold">
             System Clock: <strong className="text-white">{new Date().toLocaleTimeString()}</strong>
           </div>
         </section>
@@ -89,56 +89,56 @@ export default function AdminDashboardClient({
           <div className="glass-panel-dark rounded-2xl p-5 border-l-4 border-amber-500 shadow-lg relative overflow-hidden group">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block tracking-wider">Total Passengers</span>
+                <span className="text-[10px] font-mono text-slate-300 font-bold uppercase block tracking-wider">Total Passengers</span>
                 <span className="text-2xl font-black text-white">{studentsTotal}</span>
               </div>
               <span className="bg-amber-500/10 border border-amber-500/20 p-2 rounded-xl text-amber-400 shrink-0">
                 <Users className="h-5 w-5" />
               </span>
             </div>
-            <p className="text-[9px] text-slate-500 uppercase mt-4 tracking-wider">Registered freshmen students</p>
+            <p className="text-[9px] text-slate-300 font-medium uppercase mt-4 tracking-wider">Registered freshmen students</p>
           </div>
 
           {/* Card 2: Total Gates */}
           <div className="glass-panel-dark rounded-2xl p-5 border-l-4 border-[#2563EB] shadow-lg relative overflow-hidden group">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block tracking-wider">Active Gates</span>
+                <span className="text-[10px] font-mono text-slate-300 font-bold uppercase block tracking-wider">Active Gates</span>
                 <span className="text-2xl font-black text-white">{destinationsTotal}</span>
               </div>
               <span className="bg-[#2563EB]/10 border border-[#60A5FA]/20 p-2 rounded-xl text-[#60A5FA] shrink-0">
                 <MapPin className="h-5 w-5" />
               </span>
             </div>
-            <p className="text-[9px] text-slate-500 uppercase mt-4 tracking-wider">Active booths/activities</p>
+            <p className="text-[9px] text-slate-300 font-medium uppercase mt-4 tracking-wider">Active booths/activities</p>
           </div>
 
           {/* Card 3: Stamps Earned */}
           <div className="glass-panel-dark rounded-2xl p-5 border-l-4 border-emerald-500 shadow-lg relative overflow-hidden group">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block tracking-wider">Stamps Issued</span>
+                <span className="text-[10px] font-mono text-slate-300 font-bold uppercase block tracking-wider">Stamps Issued</span>
                 <span className="text-2xl font-black text-white">{stampsTotal}</span>
               </div>
               <span className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-xl text-emerald-400 shrink-0">
                 <BadgeCheck className="h-5 w-5" />
               </span>
             </div>
-            <p className="text-[9px] text-slate-500 uppercase mt-4 tracking-wider">Destination completions</p>
+            <p className="text-[9px] text-slate-300 font-medium uppercase mt-4 tracking-wider">Destination completions</p>
           </div>
 
           {/* Card 4: Completion Ratio */}
           <div className="glass-panel-dark rounded-2xl p-5 border-l-4 border-indigo-500 shadow-lg relative overflow-hidden group">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <span className="text-[10px] font-mono text-slate-500 uppercase block tracking-wider">Clearance Rate</span>
+                <span className="text-[10px] font-mono text-slate-300 font-bold uppercase block tracking-wider">Clearance Rate</span>
                 <span className="text-2xl font-black text-white">{overallCompletionRate}%</span>
               </div>
               <span className="bg-indigo-500/10 border border-indigo-500/20 p-2 rounded-xl text-indigo-400 shrink-0">
                 <Activity className="h-5 w-5" />
               </span>
             </div>
-            <p className="text-[9px] text-slate-500 uppercase mt-4 tracking-wider">Overall journey progress</p>
+            <p className="text-[9px] text-slate-300 font-medium uppercase mt-4 tracking-wider">Overall journey progress</p>
           </div>
         </section>
 
@@ -256,26 +256,26 @@ export default function AdminDashboardClient({
                 {activityLogs.map((log) => (
                   <div
                     key={log.id}
-                    className="p-3 bg-[#040912]/50 border border-slate-900 rounded-xl text-[11px] space-y-1.5"
+                    className="p-3 bg-[#040912]/50 border border-slate-800 rounded-xl text-[11px] space-y-1.5"
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-white uppercase tracking-wide text-xs">
                         {log.action}
                       </span>
-                      <span className="text-[8px] font-mono text-slate-500">
+                      <span className="text-[8.5px] font-mono text-slate-300 font-bold">
                         {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
 
                     {/* Show details depending on log */}
-                    <div className="text-[10px] text-slate-400 leading-normal font-sans">
+                    <div className="text-[10px] text-slate-200 leading-normal font-sans font-medium">
                       {log.action === 'Destination Cleared' ? (
                         <span>
-                          Cleared Gate <strong>{log.details?.gate_number}</strong> for {log.details?.destination_title}.
+                          Cleared Gate <strong className="text-amber-400">{log.details?.gate_number}</strong> for {log.details?.destination_title}.
                         </span>
                       ) : log.action === 'Onboarding Completed' ? (
                         <span>
-                          Issued passport ID <strong>{log.details?.student_id}</strong> for {log.details?.course?.split(' ')[0]}.
+                          Issued passport ID <strong className="text-amber-400">{log.details?.student_id}</strong> for {log.details?.course?.split(' ')[0]}.
                         </span>
                       ) : (
                         <span>System action completed.</span>
@@ -285,7 +285,7 @@ export default function AdminDashboardClient({
                 ))}
 
                 {activityLogs.length === 0 && (
-                  <div className="text-center py-8 text-slate-650 text-xs font-bold uppercase tracking-wider">
+                  <div className="text-center py-8 text-slate-400 font-bold text-xs uppercase tracking-wider">
                     Ledger logs are silent.
                   </div>
                 )}

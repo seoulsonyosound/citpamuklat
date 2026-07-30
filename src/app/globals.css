@@ -117,11 +117,11 @@ body {
 }
 
 .glass-panel-dark {
-  background: #FFFFFF;
+  background: #0E1B30;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #E2E2E0;
-  box-shadow: 0 10px 30px -5px rgba(14, 41, 49, 0.08), 0 4px 6px -2px rgba(14, 41, 49, 0.03);
+  border: 1px solid #1E293B;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

@@ -184,7 +184,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
 
           {/* Search box */}
           <div className="md:col-span-2 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <Search className="h-4 w-4" />
             </div>
             <input
@@ -192,7 +192,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search Passenger (Name, Email, Student ID...)"
-              className="w-full bg-[#0E1B30] border border-slate-800 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-100 rounded-xl py-2.5 pl-10 pr-4 outline-none text-xs outline-none transition-all"
+              className="w-full bg-[#0E1B30] border border-slate-700 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-white placeholder:text-slate-500 rounded-xl py-2.5 pl-10 pr-4 outline-none text-xs font-semibold transition-all"
             />
           </div>
 
@@ -201,7 +201,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full bg-[#0E1B30] border border-slate-800 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-350 rounded-xl py-2.5 px-4 outline-none text-xs cursor-pointer appearance-none"
+              className="w-full bg-[#0E1B30] border border-slate-700 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-100 font-semibold rounded-xl py-2.5 px-4 outline-none text-xs cursor-pointer appearance-none"
             >
               <option value="All">All Programs</option>
               <option value="Information Technology">Information Technology (BSIT)</option>
@@ -216,7 +216,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
             <select
               value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
-              className="w-full bg-[#0E1B30] border border-slate-800 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-350 rounded-xl py-2.5 px-4 outline-none text-xs cursor-pointer appearance-none"
+              className="w-full bg-[#0E1B30] border border-slate-700 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-100 font-semibold rounded-xl py-2.5 px-4 outline-none text-xs cursor-pointer appearance-none"
             >
               <option value="All">All Years</option>
               <option value="1st Year">1st Year (Freshmen)</option>
@@ -229,11 +229,11 @@ export default function StudentsClient({ students, totalGates }: Props) {
         </section>
 
         {/* PASSENGER TABLE */}
-        <section className="glass-panel-dark rounded-3xl overflow-hidden shadow-xl border border-slate-850">
+        <section className="glass-panel-dark rounded-3xl overflow-hidden shadow-xl border border-slate-800">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#040912]/80 border-b border-slate-850 font-mono text-[9px] uppercase tracking-widest text-slate-400">
+                <tr className="bg-[#040912]/80 border-b border-slate-800 font-mono text-[9.5px] uppercase tracking-widest text-slate-200 font-bold">
                   <th className="py-4 px-6">Passenger Details</th>
                   <th className="py-4 px-6">Student ID</th>
                   <th className="py-4 px-6">Course & Sec</th>
@@ -242,7 +242,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
                   <th className="py-4 px-6 text-right">Clearance Audit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-900 text-xs">
+              <tbody className="divide-y divide-slate-800 text-xs">
                 {filteredStudents.map((stud) => (
                   <tr key={stud.id} className="hover:bg-slate-900/35 transition-colors">
 
@@ -250,7 +250,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
                     <td className="py-4 px-6 flex items-center gap-3">
                       {stud.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={stud.avatar_url} alt="" className="h-8.5 w-8.5 rounded-full object-cover border border-slate-800" />
+                        <img src={stud.avatar_url} alt="" className="h-8.5 w-8.5 rounded-full object-cover border border-slate-700" />
                       ) : (
                         <div className="h-8.5 w-8.5 rounded-full bg-[#2563EB]/25 text-white flex items-center justify-center font-bold text-xs uppercase border border-[#60A5FA]/20">
                           {stud.full_name[0]}
@@ -258,7 +258,7 @@ export default function StudentsClient({ students, totalGates }: Props) {
                       )}
                       <div>
                         <div className="font-extrabold text-white uppercase tracking-wide">{stud.full_name}</div>
-                        <div className="text-[10px] text-slate-500 font-mono mt-0.5">{stud.email}</div>
+                        <div className="text-[10px] text-slate-300 font-mono font-medium mt-0.5">{stud.email}</div>
                       </div>
                     </td>
 

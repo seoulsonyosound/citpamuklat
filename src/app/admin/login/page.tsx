@@ -57,14 +57,14 @@ export default function AdminLoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel-dark rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden border border-slate-850"
+          className="glass-panel-dark rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden border border-slate-800"
         >
           {/* Top terminal HUD styling */}
-          <div className="flex justify-between items-center mb-6 border-b border-slate-850 pb-4">
-            <span className="text-[10px] text-amber-500 font-mono tracking-widest uppercase">
+          <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+            <span className="text-[10px] text-amber-400 font-mono font-bold tracking-widest uppercase">
               Immigration Operations Console
             </span>
-            <div className="flex items-center gap-1.5 text-[9px] text-slate-500 font-mono">
+            <div className="flex items-center gap-1.5 text-[9px] text-slate-300 font-mono font-bold">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               SECURE PORT 2026
             </div>
@@ -80,11 +80,11 @@ export default function AdminLoginPage() {
           <form action={formAction} className="space-y-5">
             {/* Username Input */}
             <div className="space-y-2">
-              <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
+              <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold">
                 Operator Username
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <User className="h-4.5 w-4.5" />
                 </div>
                 <input
@@ -92,18 +92,18 @@ export default function AdminLoginPage() {
                   name="username"
                   required
                   placeholder="Enter operator code"
-                  className="w-full bg-[#0E1B30] border border-slate-800 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-100 rounded-xl py-3 pl-11 pr-4 outline-none text-xs transition-all font-mono"
+                  className="w-full bg-[#0E1B30] border border-slate-700 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-white placeholder:text-slate-500 rounded-xl py-3 pl-11 pr-4 outline-none text-xs transition-all font-mono font-semibold"
                 />
               </div>
             </div>
 
             {/* Password Input */}
             <div className="space-y-2">
-              <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
+              <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold">
                 Clearance Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="h-4.5 w-4.5" />
                 </div>
                 <input
@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
                   name="password"
                   required
                   placeholder="Enter authorization key"
-                  className="w-full bg-[#0E1B30] border border-slate-800 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-slate-100 rounded-xl py-3 pl-11 pr-4 outline-none text-xs transition-all font-mono"
+                  className="w-full bg-[#0E1B30] border border-slate-700 focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/40 text-white placeholder:text-slate-500 rounded-xl py-3 pl-11 pr-4 outline-none text-xs transition-all font-mono font-semibold"
                 />
               </div>
             </div>
@@ -120,10 +120,10 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-extrabold py-3.5 px-6 rounded-xl transition-all duration-300 shadow-xl shadow-amber-600/10 border border-amber-500/25 mt-6 cursor-pointer text-xs uppercase tracking-widest"
+              className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-black py-3.5 px-6 rounded-xl transition-all duration-300 shadow-xl shadow-amber-600/10 border border-amber-500/25 mt-6 cursor-pointer text-xs uppercase tracking-widest"
             >
               {isPending ? 'Requesting Operations Entry...' : 'Unlock Control Panel'}
-              {!isPending && <ArrowRight className="h-4.5 w-4.5 text-white/80" />}
+              {!isPending && <ArrowRight className="h-4.5 w-4.5 text-white/90" />}
             </button>
           </form>
         </motion.div>
@@ -133,9 +133,9 @@ export default function AdminLoginPage() {
       <div className="mt-8 text-center z-10">
         <Link
           href="/login"
-          className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-[#12484C] transition-colors uppercase tracking-widest border-b border-transparent hover:border-[#12484C]/40 font-mono pb-0.5"
+          className="inline-flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition-colors uppercase tracking-widest border-b border-transparent hover:border-white/40 font-mono pb-0.5 font-bold"
         >
-          <Ticket className="h-3.5 w-3.5 text-[#2B7574]" /> Return to Passenger Kiosk (Check-In)
+          <Ticket className="h-3.5 w-3.5 text-amber-400" /> Return to Passenger Kiosk (Check-In)
         </Link>
       </div>
     </div>

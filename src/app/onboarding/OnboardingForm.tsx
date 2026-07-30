@@ -231,22 +231,22 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Student ID */}
               <div>
-                <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">
+                <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold mb-2">
                   Student ID Number
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <Hash className="h-4.5 w-4.5" />
                   </div>
                   <input
                     type="text"
                     {...register('studentId')}
                     placeholder="e.g. 2026-10293"
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 rounded-xl py-3 pl-11 pr-4 outline-none text-sm transition-all font-mono"
+                    className="w-full bg-[#0E1B30] border border-slate-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-white placeholder:text-slate-500 rounded-xl py-3 pl-11 pr-4 outline-none text-sm transition-all font-mono font-semibold"
                   />
                 </div>
                 {errors.studentId && (
-                  <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1">
+                  <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 font-bold">
                     ⚠️ {errors.studentId.message}
                   </p>
                 )}
@@ -254,16 +254,16 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
 
               {/* Course selection */}
               <div>
-                <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">
+                <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold mb-2">
                   CIT Academic Program
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                     <BookOpen className="h-4.5 w-4.5" />
                   </div>
                   <select
                     {...register('course')}
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 rounded-xl py-3 pl-11 pr-4 outline-none text-sm transition-all appearance-none cursor-pointer"
+                    className="w-full bg-[#0E1B30] border border-slate-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 font-semibold rounded-xl py-3 pl-11 pr-4 outline-none text-sm transition-all appearance-none cursor-pointer"
                   >
                     <option value="BS in Information Technology">BS in Information Technology (BSIT)</option>
                     <option value="BS in Computer Science">BS in Computer Science (BSCS)</option>
@@ -272,7 +272,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
                   </select>
                 </div>
                 {errors.course && (
-                  <p className="text-[11px] text-red-400 mt-1.5">⚠️ {errors.course.message}</p>
+                  <p className="text-[11px] text-red-400 mt-1.5 font-bold">⚠️ {errors.course.message}</p>
                 )}
               </div>
 
@@ -280,32 +280,32 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 {/* Section */}
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">
+                  <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold mb-2">
                     Class Section
                   </label>
                   <input
                     type="text"
                     {...register('section')}
                     placeholder="e.g. 1-A or 1-B"
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-sm transition-all"
+                    className="w-full bg-[#0E1B30] border border-slate-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-white placeholder:text-slate-500 rounded-xl py-3 px-4 outline-none text-sm font-semibold transition-all"
                   />
                   {errors.section && (
-                    <p className="text-[11px] text-red-400 mt-1.5">⚠️ {errors.section.message}</p>
+                    <p className="text-[11px] text-red-400 mt-1.5 font-bold">⚠️ {errors.section.message}</p>
                   )}
                 </div>
 
                 {/* Year level */}
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold mb-2">
+                  <label className="block text-xs uppercase tracking-widest text-slate-200 font-bold mb-2">
                     Year Level
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                       <Calendar className="h-4.5 w-4.5" />
                     </div>
                     <select
                       {...register('yearLevel')}
-                      className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 rounded-xl py-3 pl-10 pr-4 outline-none text-sm transition-all appearance-none cursor-pointer"
+                      className="w-full bg-[#0E1B30] border border-slate-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-100 font-semibold rounded-xl py-3 pl-10 pr-4 outline-none text-sm transition-all appearance-none cursor-pointer"
                     >
                       <option value="1st Year">1st Year (Freshman)</option>
                       <option value="2nd Year">2nd Year (Sophomore)</option>
@@ -314,7 +314,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
                     </select>
                   </div>
                   {errors.yearLevel && (
-                    <p className="text-[11px] text-red-400 mt-1.5">⚠️ {errors.yearLevel.message}</p>
+                    <p className="text-[11px] text-red-400 mt-1.5 font-bold">⚠️ {errors.yearLevel.message}</p>
                   )}
                 </div>
               </div>
@@ -323,10 +323,10 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
               <button
                 type="submit"
                 disabled={issuing}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] disabled:opacity-50 text-white font-bold py-3.5 px-6 rounded-2xl transition-all duration-300 mt-6 shadow-xl shadow-[#2563EB]/25 border border-[#60A5FA]/30 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] disabled:opacity-50 text-white font-extrabold py-3.5 px-6 rounded-2xl transition-all duration-300 mt-6 shadow-xl shadow-[#2563EB]/25 border border-[#60A5FA]/30 cursor-pointer"
               >
                 {issuing ? 'Verifying Credentials...' : 'Issue Passport & Enter CIT'}
-                {!issuing && <ArrowRight className="h-4.5 w-4.5" />}
+                {!issuing && <ArrowRight className="h-4.5 w-4.5 text-white" />}
               </button>
             </form>
           </motion.div>

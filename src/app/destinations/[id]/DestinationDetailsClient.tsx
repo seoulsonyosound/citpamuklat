@@ -376,10 +376,10 @@ export default function DestinationDetailsClient({
 
           {/* TICKET FOOTER INSTRUCTIONS */}
           <div className="bg-[#EDF1F7] p-5 border-t border-[#D4DCE8] space-y-3">
-            <h4 className="text-xs font-extrabold text-[#0F1D36] uppercase tracking-wider flex items-center gap-1.5">
+            <h4 className="text-xs font-black text-[#0F1D36] uppercase tracking-wider flex items-center gap-1.5">
               <Compass className="h-4 w-4 text-[#1E4FCC]" /> Clearance Instructions
             </h4>
-            <p className="text-xs text-[#5A6B85] leading-relaxed">
+            <p className="text-xs text-[#2D3748] font-medium leading-relaxed">
               {destination.instructions}
             </p>
           </div>

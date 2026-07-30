@@ -14,10 +14,15 @@ export async function GET(request: Request) {
     if (!error && data?.user) {
       const user = data.user
       const email = user.email || ''
-      const domain = email.split('@')[1]
+      const domain = email.split('@')[1] || ''
       
+      const allowedDomain = process.env.NEXT_PUBLIC_ALLOWED_DOMAIN || 'ua.edu.ph'
       const allowAll = process.env.NEXT_PUBLIC_ALLOW_ALL_EMAILS === 'true'
-      const isValidDomain = domain === 'student.ua.edu.ph' || allowAll
+      const isValidDomain =
+        domain === allowedDomain ||
+        domain.endsWith(`.${allowedDomain}`) ||
+        email.endsWith(`@${allowedDomain}`) ||
+        allowAll
 
       if (!isValidDomain) {
         // Sign out immediately and redirect back to login with error

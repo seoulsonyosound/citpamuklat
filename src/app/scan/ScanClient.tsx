@@ -224,7 +224,7 @@ export default function ScanClient() {
               <Key className="h-10 w-10 text-[#1E4FCC] mx-auto opacity-80 mb-2" />
               <div>
                 <h4 className="text-sm font-black text-[#0F1D36] uppercase tracking-wider">Manual Code Authenticator</h4>
-                <p className="text-[10px] text-[#5A6B85] mt-1 max-w-xs mx-auto leading-relaxed">
+                <p className="text-xs text-[#2D3748] font-medium mt-1 max-w-xs mx-auto leading-relaxed">
                   Enter the student ID code or gate token string below to issue stamp clearance manually.
                 </p>
               </div>
@@ -233,12 +233,12 @@ export default function ScanClient() {
                 value={manualToken}
                 onChange={(e) => setManualToken(e.target.value)}
                 placeholder="Paste token or Student ID here..."
-                className="w-full bg-[#F5F7FB] border border-[#D4DCE8] focus:border-[#1E4FCC] focus:ring-1 focus:ring-[#1E4FCC] text-[#0F1D36] rounded-xl py-3.5 px-4 outline-none text-xs text-center transition-all font-mono font-bold"
+                className="w-full bg-[#F5F7FB] border border-[#D4DCE8] focus:border-[#1E4FCC] focus:ring-1 focus:ring-[#1E4FCC] text-[#0F1D36] placeholder:text-[#5A6B85] rounded-xl py-3.5 px-4 outline-none text-xs text-center transition-all font-mono font-bold"
               />
               <button
                 type="submit"
                 disabled={loading || !manualToken.trim()}
-                className="w-full flex items-center justify-center gap-1.5 bg-[#1E4FCC] hover:bg-[#153FA8] disabled:opacity-50 text-white text-[10px] font-extrabold uppercase tracking-wider py-3.5 rounded-xl cursor-pointer shadow-md shadow-[#1E4FCC]/20"
+                className="w-full flex items-center justify-center gap-1.5 bg-[#1E4FCC] hover:bg-[#153FA8] disabled:opacity-50 text-white text-[10px] font-black uppercase tracking-wider py-3.5 rounded-xl cursor-pointer shadow-md shadow-[#1E4FCC]/20"
               >
                 Authenticate Clearance
               </button>

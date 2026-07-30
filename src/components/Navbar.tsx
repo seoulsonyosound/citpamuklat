@@ -96,18 +96,18 @@ export default function Navbar() {
                   className={`relative flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                     isActive
                       ? 'text-white'
-                      : 'text-[#5A6B85] hover:text-[#052856]'
+                      : 'text-[#3B4E6B] font-extrabold hover:text-[#052856]'
                   }`}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="activeNavIndicator"
-                      className="absolute inset-0 bg-gradient-to-r from-[#052856] to-[#0A3A78] rounded-xl shadow-md shadow-[#052856]/20 border border-[#0A3A78]/30 -z-10"
+                      className="absolute inset-0 bg-gradient-to-r from-[#052856] to-[#0A3A78] rounded-xl shadow-md shadow-[#052856]/20 border border-[#0A3A78]/30 z-0"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                  <span className="hidden sm:inline md:inline">{link.name}</span>
+                  <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 relative z-10" />
+                  <span className="hidden sm:inline md:inline relative z-10">{link.name}</span>
                 </div>
               </Link>
             )
@@ -117,7 +117,7 @@ export default function Navbar() {
         {/* User profile dropdown & Logout */}
         <div className="flex items-center gap-2 sm:gap-3.5">
           {/* Notifications bell */}
-          <Link href="/dashboard#notifications" className="relative cursor-pointer hover:text-[#052856] text-[#5A6B85] transition-colors p-1.5">
+          <Link href="/dashboard#notifications" className="relative cursor-pointer hover:text-[#052856] text-[#3B4E6B] transition-colors p-1.5 font-bold">
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#861211] text-white font-mono font-black text-[9px] px-1.5 py-0.2 rounded-full border-2 border-white">
@@ -142,10 +142,10 @@ export default function Navbar() {
                 </div>
               )}
               <div className="hidden lg:block text-left">
-                <span className="text-[10px] font-extrabold text-[#052856] block max-w-[100px] truncate">
+                <span className="text-[10px] font-black text-[#052856] block max-w-[100px] truncate">
                   {profile.full_name}
                 </span>
-                <span className="text-[8px] font-bold text-[#5A6B85] block uppercase truncate max-w-[100px]">
+                <span className="text-[8.5px] font-extrabold text-[#3B4E6B] block uppercase truncate max-w-[100px]">
                   {profile.course ? profile.course.split(' ')[0] : 'Freshman'}
                 </span>
               </div>
@@ -155,7 +155,7 @@ export default function Navbar() {
           {/* Exit Logout */}
           <button
             onClick={handleLogout}
-            className="bg-[#F4F4F2] border border-[#E2E2E0] hover:bg-[#861211]/10 hover:border-[#861211]/30 hover:text-[#861211] p-2 rounded-xl text-[#5A6B85] transition-all cursor-pointer"
+            className="bg-[#F4F4F2] border border-[#E2E2E0] hover:bg-[#861211]/10 hover:border-[#861211]/30 hover:text-[#861211] p-2 rounded-xl text-[#3B4E6B] transition-all cursor-pointer font-bold"
             title="Log Out Terminal"
           >
             <LogOut className="h-4 w-4" />

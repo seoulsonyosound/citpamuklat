@@ -216,51 +216,51 @@ export default function DestinationsClient({ initialDestinations }: Props) {
               </div>
 
               {/* Description */}
-              <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">
                 {dest.description}
               </p>
 
               {/* Parameters */}
-              <div className="bg-[#040912]/50 border border-slate-900 p-3 rounded-2xl grid grid-cols-2 gap-3 font-mono text-[9px] uppercase text-slate-400">
+              <div className="bg-[#040912]/50 border border-slate-800 p-3 rounded-2xl grid grid-cols-2 gap-3 font-mono text-[9px] uppercase text-slate-300">
                 <div className="space-y-1">
-                  <span className="text-slate-550 block font-sans text-[8px]">Est Duration:</span>
-                  <span className="font-bold text-white flex items-center gap-1"><Clock className="h-3 w-3" /> {dest.estimated_duration}</span>
+                  <span className="text-slate-400 block font-sans text-[8.5px] font-bold">Est Duration:</span>
+                  <span className="font-bold text-white flex items-center gap-1"><Clock className="h-3 w-3 text-amber-400" /> {dest.estimated_duration}</span>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-slate-550 block font-sans text-[8px]">Representative:</span>
-                  <span className="font-bold text-white flex items-center gap-1"><Compass className="h-3 w-3" /> {dest.representative}</span>
+                  <span className="text-slate-400 block font-sans text-[8.5px] font-bold">Representative:</span>
+                  <span className="font-bold text-white flex items-center gap-1"><Compass className="h-3 w-3 text-sky-400" /> {dest.representative}</span>
                 </div>
               </div>
 
               {/* Actions row */}
-              <div className="flex gap-2.5 pt-2 border-t border-slate-900">
+              <div className="flex gap-2.5 pt-2 border-t border-slate-800">
                 <button
                   onClick={() => openForm(dest)}
-                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-350 font-mono text-[9px] uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-800 cursor-pointer"
+                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-200 font-mono text-[9.5px] font-bold uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-700 cursor-pointer"
                   title="Modify Settings"
                 >
-                  <Edit2 className="h-3.5 w-3.5" /> Edit
+                  <Edit2 className="h-3.5 w-3.5 text-sky-400" /> Edit
                 </button>
                 <button
                   onClick={() => handleRegenerateQR(dest)}
-                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-350 font-mono text-[9px] uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-800 cursor-pointer"
+                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-200 font-mono text-[9.5px] font-bold uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-700 cursor-pointer"
                   title="Issue New Code"
                 >
-                  <QrCode className="h-3.5 w-3.5 text-amber-500" /> Token
+                  <QrCode className="h-3.5 w-3.5 text-amber-400" /> Token
                 </button>
                 <button
                   onClick={() => handleDelete(dest.id)}
-                  className="bg-[#0e1b30] hover:bg-red-950/20 text-slate-450 hover:text-red-400 p-2 rounded-lg border border-slate-800 hover:border-red-500/10 cursor-pointer transition-colors"
+                  className="bg-[#0e1b30] hover:bg-red-950/20 text-slate-300 hover:text-red-400 p-2 rounded-lg border border-slate-700 hover:border-red-500/20 cursor-pointer transition-colors"
                   title="Delete gate"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5 text-red-400" />
                 </button>
               </div>
             </motion.div>
           ))}
 
           {destinations.length === 0 && (
-            <div className="col-span-full text-center py-16 rounded-3xl border border-dashed border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+            <div className="col-span-full text-center py-16 rounded-3xl border border-dashed border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
               No flight gates assigned. Click "Add New Gate" to generate one.
             </div>
           )}

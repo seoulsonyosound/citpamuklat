@@ -49,7 +49,7 @@ export default function PassportClient({ profile, destinations, completions }: P
     const cleanId = (profile.student_id || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
 
     return (
-      <div className="font-mono text-[9px] text-[#4A3728]/70 leading-none tracking-widest uppercase border-t border-[#4A3728]/15 pt-3.5 mt-3 select-none">
+      <div className="font-mono text-[9.5px] text-[#2D1F15] font-extrabold leading-none tracking-widest uppercase border-t border-[#4A3728]/25 pt-3.5 mt-3 select-none">
         <div>P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
         <div>{cleanId}PHL{courseCode}&lt;{profile.section}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
       </div>
@@ -84,13 +84,13 @@ export default function PassportClient({ profile, destinations, completions }: P
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <span className="text-xs uppercase tracking-[0.25em] text-[#2B7574] font-extrabold flex items-center justify-center gap-1.5 mb-1">
-            <Plane className="h-4 w-4 text-[#2B7574]" /> Electronic Passport Booklet
+          <span className="text-xs uppercase tracking-[0.25em] text-[#1E4FCC] font-black flex items-center justify-center gap-1.5 mb-1">
+            <Plane className="h-4 w-4 text-[#1E4FCC]" /> Electronic Passport Booklet
           </span>
           <h2 className="text-3xl font-black text-[#0F1D36] tracking-tight">
             MY DIGITAL CAMPUS PASSPORT
           </h2>
-          <p className="text-xs text-[#5A6B85] mt-2 max-w-sm mx-auto leading-relaxed font-medium">
+          <p className="text-xs text-[#2D3748] font-medium mt-2 max-w-sm mx-auto leading-relaxed">
             Click the passport cover below to flip open your booklet and view your collected Pamuklat clearance stamps.
           </p>
         </motion.div>
@@ -113,10 +113,10 @@ export default function PassportClient({ profile, destinations, completions }: P
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 rounded-3xl pointer-events-none" />
 
                 <div className="space-y-2">
-                  <span className="text-[8px] tracking-[0.35em] text-slate-300 font-extrabold uppercase block leading-none">
+                  <span className="text-[8.5px] tracking-[0.35em] text-slate-100 font-black uppercase block leading-none">
                     University of the Assumption
                   </span>
-                  <span className="text-[7px] tracking-[0.2em] text-slate-400 font-bold uppercase block">
+                  <span className="text-[7.5px] tracking-[0.2em] text-slate-200 font-extrabold uppercase block">
                     Pampanga, Philippines
                   </span>
                 </div>
@@ -132,7 +132,7 @@ export default function PassportClient({ profile, destinations, completions }: P
                     <h3 className="text-lg font-black tracking-[0.1em] text-white uppercase">
                       DIGITAL PASSPORT
                     </h3>
-                    <span className="text-[9px] tracking-[0.25em] text-[#60A5FA] font-bold uppercase block">
+                    <span className="text-[9.5px] tracking-[0.25em] text-[#60A5FA] font-black uppercase block">
                       CIT Freshmen Onboarding
                     </span>
                   </div>
@@ -147,7 +147,7 @@ export default function PassportClient({ profile, destinations, completions }: P
                   </div>
 
                   <button className="flex items-center gap-1.5 mx-auto bg-white/15 hover:bg-white/25 text-white font-extrabold text-[9px] uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all border border-white/20 cursor-pointer shadow-md group-hover:translate-x-1">
-                    Open Passport <ArrowRight className="h-3 w-3" />
+                    Open Passport <ArrowRight className="h-3 w-3 text-white" />
                   </button>
                 </div>
               </motion.div>
@@ -165,15 +165,15 @@ export default function PassportClient({ profile, destinations, completions }: P
                 <div className="absolute top-0 bottom-0 left-1/2 w-8 bg-gradient-to-r from-black/20 via-transparent to-black/20 transform -translate-x-1/2 pointer-events-none hidden md:block z-20" />
 
                 {/* LEFT PAGE: Biological Identity Data Card */}
-                <div className="w-full md:w-1/2 p-6 md:p-8 passport-inner-bg text-[#4A3728] flex flex-col justify-between relative min-h-[380px] border-b md:border-b-0 md:border-r border-slate-300">
+                <div className="w-full md:w-1/2 p-6 md:p-8 passport-inner-bg text-[#2D1F15] flex flex-col justify-between relative min-h-[380px] border-b md:border-b-0 md:border-r border-slate-300">
                   {/* Holographic school seal watermark */}
                   <div className="absolute right-6 top-8 w-24 h-24 rounded-full border border-indigo-900/5 bg-indigo-950/[0.02] flex items-center justify-center pointer-events-none">
-                    <span className="text-[7px] uppercase font-bold text-indigo-950/10 tracking-widest text-center">OFFICIAL SEAL</span>
+                    <span className="text-[7px] uppercase font-black text-indigo-950/20 tracking-widest text-center">OFFICIAL SEAL</span>
                   </div>
 
-                  <div className="flex justify-between items-start border-b border-[#4A3728]/15 pb-3">
+                  <div className="flex justify-between items-start border-b border-[#4A3728]/25 pb-3">
                     <div>
-                      <span className="text-[7px] uppercase tracking-[0.2em] text-[#78614E] font-extrabold block leading-none">
+                      <span className="text-[7.5px] uppercase tracking-[0.2em] text-[#3E2723] font-black block leading-none">
                         University of the Assumption
                       </span>
                       <span className="text-[10px] font-black text-indigo-950 tracking-tight block uppercase mt-1">
@@ -181,10 +181,10 @@ export default function PassportClient({ profile, destinations, completions }: P
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[7px] uppercase tracking-[0.2em] text-[#78614E] font-extrabold block leading-none">
+                      <span className="text-[7.5px] uppercase tracking-[0.2em] text-[#3E2723] font-black block leading-none">
                         Passport No.
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-indigo-950">
+                      <span className="text-[10px] font-mono font-black text-indigo-950">
                         UA-2026-{profile.student_id ? profile.student_id.slice(-4) : '2026'}
                       </span>
                     </div>
@@ -193,12 +193,12 @@ export default function PassportClient({ profile, destinations, completions }: P
                   {/* Biological Photo & Text grids */}
                   <div className="flex gap-4 items-center mt-4 flex-1">
                     {/* Passport Photo */}
-                    <div className="relative w-20 h-26 rounded-lg overflow-hidden border-2 border-indigo-950/20 bg-slate-200 shadow-inner flex items-center justify-center shrink-0">
+                    <div className="relative w-20 h-26 rounded-lg overflow-hidden border-2 border-indigo-950/30 bg-slate-200 shadow-inner flex items-center justify-center shrink-0">
                       {profile.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
                       ) : (
-                        <User className="h-10 w-10 text-slate-400" />
+                        <User className="h-10 w-10 text-slate-500" />
                       )}
                       {/* Biometric overlay */}
                       <div className="absolute inset-0 border border-emerald-500/20 pointer-events-none" />
@@ -211,38 +211,38 @@ export default function PassportClient({ profile, destinations, completions }: P
                     {/* Passport detail labels */}
                     <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[9px] flex-1">
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Surname / Given Name</span>
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Surname / Given Name</span>
                         <span className="font-extrabold text-indigo-950 uppercase truncate block max-w-[130px]">
                           {profile.full_name}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Student ID</span>
-                        <span className="font-mono font-bold text-indigo-950">
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Student ID</span>
+                        <span className="font-mono font-black text-indigo-950">
                           {profile.student_id}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Academic Program</span>
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Academic Program</span>
                         <span className="font-extrabold text-indigo-950 truncate block max-w-[130px]" title={profile.course}>
                           {profile.course}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Class Section</span>
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Class Section</span>
                         <span className="font-extrabold text-indigo-950 uppercase">
                           {profile.section}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Registration Date</span>
-                        <span className="font-semibold text-slate-700">
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Registration Date</span>
+                        <span className="font-extrabold text-[#2D1F15]">
                           {new Date(profile.registration_date).toLocaleDateString()}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[6.5px] text-[#78614E] uppercase block font-bold leading-none">Year Level</span>
-                        <span className="font-bold text-slate-700">
+                        <span className="text-[7px] text-[#3E2723] uppercase block font-black leading-none">Year Level</span>
+                        <span className="font-extrabold text-[#2D1F15]">
                           {profile.year_level}
                         </span>
                       </div>

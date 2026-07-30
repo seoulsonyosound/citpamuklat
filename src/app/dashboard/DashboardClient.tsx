@@ -148,7 +148,7 @@ export default function DashboardClient({
             <h2 className="text-3xl font-extrabold text-[#0F1D36] tracking-tight">
               WELCOME BACK, {profile.full_name.toUpperCase()}
             </h2>
-            <p className="text-xs text-[#5A6B85] max-w-xl leading-relaxed">
+            <p className="text-xs text-[#2D3748] font-medium max-w-xl leading-relaxed">
               Explore your freshmen campus orientation tour! Visit each booth stop to collect stamps in your <strong className="text-[#0F1D36]">Digital Passport</strong>.
             </p>
           </div>
@@ -156,17 +156,17 @@ export default function DashboardClient({
           {/* Passenger Boarding Card Summary */}
           <div className="bg-[#EDF1F7] border border-[#D4DCE8] rounded-2xl p-4 flex gap-4 shrink-0 w-full md:w-auto font-mono text-[11px] uppercase tracking-wider shadow-sm">
             <div className="space-y-1.5 border-r border-[#D4DCE8] pr-4">
-              <div className="text-[#5A6B85] font-sans text-[9px]">Explorer Class</div>
+              <div className="text-[#2D3748] font-sans text-[9px] font-bold">Explorer Class</div>
               <div className="font-bold text-[#0F1D36]">{profile.course.split(' ')[0]}</div>
-              <div className="text-[#5A6B85] font-sans text-[9px] mt-1.5">Section</div>
+              <div className="text-[#2D3748] font-sans text-[9px] font-bold mt-1.5">Section</div>
               <div className="font-bold text-[#1E4FCC]">{profile.section}</div>
             </div>
             <div className="space-y-1.5 pl-2">
-              <div className="text-[#5A6B85] font-sans text-[9px]">Passport Status</div>
-              <div className="font-bold text-emerald-600 flex items-center gap-1">
+              <div className="text-[#2D3748] font-sans text-[9px] font-bold">Passport Status</div>
+              <div className="font-bold text-emerald-700 flex items-center gap-1">
                 <ShieldCheck className="h-3.5 w-3.5" /> VERIFIED
               </div>
-              <div className="text-[#5A6B85] font-sans text-[9px] mt-1.5">Tour Checkpoints</div>
+              <div className="text-[#2D3748] font-sans text-[9px] font-bold mt-1.5">Tour Checkpoints</div>
               <div className="font-bold text-[#0F1D36]">{completedCount} / {totalDestinations} CLEARED</div>
             </div>
           </div>
@@ -335,17 +335,17 @@ export default function DashboardClient({
                           </div>
                         </div>
 
-                        <p className="text-xs text-[#5A6B85] line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#2D3748] font-medium line-clamp-2 leading-relaxed">
                           {dest.description}
                         </p>
 
-                        <div className="flex items-center gap-5 text-[10px] text-[#5A6B85] font-mono uppercase">
+                        <div className="flex items-center gap-5 text-[10px] text-[#2D3748] font-mono font-bold uppercase">
                           <div className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5 text-[#5A6B85]" />
+                            <Clock className="h-3.5 w-3.5 text-[#1E4FCC]" />
                             <span>Est: {dest.estimated_duration}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Compass className="h-3.5 w-3.5 text-[#5A6B85]" />
+                            <Compass className="h-3.5 w-3.5 text-[#1E4FCC]" />
                             <span>Rep: {dest.representative}</span>
                           </div>
                         </div>
