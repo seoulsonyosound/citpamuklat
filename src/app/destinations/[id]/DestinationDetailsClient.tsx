@@ -259,7 +259,7 @@ export default function DestinationDetailsClient({
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] text-[#0F1D36] flex flex-col pb-12 relative overflow-hidden">
+    <div className={`min-h-screen bg-[#F4F6F9] text-[#0F1D36] flex flex-col ${localCompleted && nextDestination ? 'pb-28' : 'pb-12'} relative overflow-hidden`}>
       {/* Top Header Background Banner */}
       <div className="absolute top-0 left-0 right-0 h-[240px] bg-gradient-to-r from-[#052856] via-[#0A3A78] to-[#052856] text-white opacity-95 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -612,6 +612,33 @@ export default function DestinationDetailsClient({
           </>
         )}
       </AnimatePresence>
+
+      {/* Sticky/Fixed bottom panel for next gate navigation if completed */}
+      {localCompleted && nextDestination && (
+        <motion.div 
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
+          className="fixed bottom-0 inset-x-0 bg-white border-t border-[#E2E8F0] p-4 flex items-center justify-between z-40 shadow-[0_-8px_30px_rgb(0,0,0,0.06)]"
+        >
+          <div className="flex-1 min-w-0 pr-4">
+            <span className="text-[9px] font-mono font-black text-[#0A3A78] uppercase tracking-widest block leading-none">
+              Immigration Clear
+            </span>
+            <span className="font-black text-xs text-[#052856] block truncate mt-1.5">
+              Next Stop: {nextDestination.gate_number} • {nextDestination.title}
+            </span>
+          </div>
+          <button
+            onClick={handleGoToNextGate}
+            className="bg-[#052856] hover:bg-[#031D40] active:bg-[#020F24] text-white text-xs font-black uppercase tracking-wider py-3 px-5 rounded-2xl shadow-lg shadow-[#052856]/15 flex items-center gap-1.5 shrink-0 cursor-pointer min-h-[46px] transition-all"
+          >
+            Go to Next Gate
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </motion.div>
+      )}
     </div>
   )
 }
+
