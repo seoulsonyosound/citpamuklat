@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plane, User, ShieldCheck, ArrowRight, ArrowLeft, BookOpen, Star, HelpCircle, Bookmark } from 'lucide-react'
+import { Plane, User, ShieldCheck, ArrowRight, ArrowLeft, BookOpen, Star, HelpCircle, Bookmark, Download, FileText, RefreshCw } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
 interface Profile {
@@ -41,7 +41,53 @@ interface Props {
 
 export default function PassportClient({ profile, destinations, completions }: Props) {
   const [isOpen, setIsOpen] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const passportRef = useRef<HTMLDivElement>(null)
   const completedIds = completions.map((c) => c.destination_id)
+
+  const handleDownloadPassport = async (format: 'png' | 'pdf' = 'png') => {
+    if (!passportRef.current) return
+    setDownloading(true)
+
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(passportRef.current, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#F5F7FB',
+        logging: false,
+        scale: 2,
+      } as any)
+
+      const cleanStudentId = profile.student_id ? profile.student_id.replace(/[^a-z0-9]/gi, '_') : 'passport'
+      const filename = `CIT_Passport_${profile.full_name.replace(/\s+/g, '_')}_${cleanStudentId}`
+
+      if (format === 'png') {
+        const image = canvas.toDataURL('image/png')
+        const link = document.createElement('a')
+        link.href = image
+        link.download = `${filename}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } else {
+        const jsPDF = (await import('jspdf')).default
+        const imgData = canvas.toDataURL('image/png')
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [canvas.width, canvas.height],
+        })
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+        pdf.save(`${filename}.pdf`)
+      }
+    } catch (err) {
+      console.error('Failed to generate downloadable passport:', err)
+      alert('Could not generate passport download. Please try again.')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   const generateMRZ = () => {
     const formattedName = profile.full_name.replace(/\s+/g, '<').toUpperCase()
@@ -82,17 +128,48 @@ export default function PassportClient({ profile, destinations, completions }: P
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center"
+          className="text-center space-y-4"
         >
-          <span className="text-xs uppercase tracking-[0.25em] text-[#1E4FCC] font-black flex items-center justify-center gap-1.5 mb-1">
-            <Plane className="h-4 w-4 text-[#1E4FCC]" /> Electronic Passport Booklet
-          </span>
-          <h2 className="text-3xl font-black text-[#0F1D36] tracking-tight">
-            MY DIGITAL CAMPUS PASSPORT
-          </h2>
-          <p className="text-xs text-[#2D3748] font-medium mt-2 max-w-sm mx-auto leading-relaxed">
-            Click the passport cover below to flip open your booklet and view your collected Pamuklat clearance stamps.
-          </p>
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-[#1E4FCC] font-black flex items-center justify-center gap-1.5 mb-1">
+              <Plane className="h-4 w-4 text-[#1E4FCC]" /> Electronic Passport Booklet
+            </span>
+            <h2 className="text-3xl font-black text-[#0F1D36] tracking-tight">
+              MY DIGITAL CAMPUS PASSPORT
+            </h2>
+            <p className="text-xs text-[#2D3748] font-medium mt-2 max-w-sm mx-auto leading-relaxed">
+              {isOpen
+                ? 'Your passport is open below. Use the download buttons to save a high-resolution copy of your clearance stamps.'
+                : 'Click the passport cover below to flip open your booklet and view your collected Pamuklat clearance stamps.'}
+            </p>
+          </div>
+
+          {/* DOWNLOAD PASSPORT CONTROL BUTTONS (Shown when passport is open) */}
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-wrap items-center justify-center gap-3 pt-2"
+            >
+              <button
+                onClick={() => handleDownloadPassport('png')}
+                disabled={downloading}
+                className="flex items-center gap-2 bg-[#052856] hover:bg-[#031D40] active:bg-[#020F24] text-white font-black text-xs uppercase tracking-wider px-5 py-3 rounded-2xl transition-all shadow-lg shadow-[#052856]/15 cursor-pointer disabled:opacity-50"
+              >
+                <Download className="h-4 w-4 text-white" />
+                {downloading ? 'Exporting Passport...' : 'Download Passport (PNG Image)'}
+              </button>
+
+              <button
+                onClick={() => handleDownloadPassport('pdf')}
+                disabled={downloading}
+                className="flex items-center gap-2 bg-white hover:bg-slate-50 border border-[#CBD5E1] text-[#052856] font-extrabold text-xs uppercase tracking-wider px-4 py-3 rounded-2xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                <FileText className="h-4 w-4 text-[#052856]" />
+                Download PDF
+              </button>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* PASSPORT BOOKLET FRAME CONTAINER */}
@@ -154,6 +231,7 @@ export default function PassportClient({ profile, destinations, completions }: P
             ) : (
               /* PASSPORT INSIDE PAGES SPREAD (TWO COLUMNS) */
               <motion.div
+                ref={passportRef}
                 key="passport-inner"
                 initial={{ scale: 0.9, opacity: 0, rotateY: 90 }}
                 animate={{ scale: 1, opacity: 1, rotateY: 0 }}
@@ -332,8 +410,18 @@ export default function PassportClient({ profile, destinations, completions }: P
                       <ArrowLeft className="h-3 w-3" /> Close Cover
                     </button>
 
-                    <div className="flex items-center gap-1 text-[8px] text-[#78614E] font-bold uppercase">
-                      <ShieldCheck className="h-3.5 w-3.5 text-indigo-900" /> Biometric Secured
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDownloadPassport('png')}
+                        disabled={downloading}
+                        className="flex items-center gap-1 bg-[#052856] hover:bg-[#031D40] text-white font-extrabold text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+                      >
+                        <Download className="h-3 w-3 text-white" />
+                        {downloading ? 'Exporting...' : 'Download Passport'}
+                      </button>
+                      <div className="hidden sm:flex items-center gap-1 text-[8px] text-[#78614E] font-bold uppercase">
+                        <ShieldCheck className="h-3.5 w-3.5 text-indigo-900" /> Biometric Secured
+                      </div>
                     </div>
                   </div>
                 </div>
