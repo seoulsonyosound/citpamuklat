@@ -86,21 +86,21 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
     const cleanId = (watchStudentId || '0000000').padEnd(10, '<').replace(/\s+/g, '<')
 
     return (
-      <div className="font-mono text-[9px] text-[#0A3A78] leading-none tracking-widest uppercase mt-4 border-t border-[#E2E8F0] pt-3">
-        <div>P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-        <div>{cleanId}PHL{formattedCourse}&lt;{watchSection || '1A'}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+      <div className="font-mono text-[7.5px] sm:text-[9px] text-[#0A3A78] leading-none tracking-tight sm:tracking-widest uppercase mt-2.5 sm:mt-4 border-t border-[#E2E8F0] pt-2 sm:pt-3 overflow-hidden whitespace-nowrap z-10">
+        <div className="truncate">P&lt;PHL{formattedName}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+        <div className="truncate">{cleanId}PHL{formattedCourse}&lt;{watchSection || '1A'}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen relative overflow-y-auto bg-[#F4F6F9] text-[#0F1D36] flex flex-col items-center justify-center p-4 md:p-8">
+    <div className="min-h-screen relative overflow-y-auto bg-[#F4F6F9] text-[#0F1D36] flex flex-col items-center justify-center p-3 sm:p-6 md:p-8">
       {/* Background radial overlays */}
       <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] bg-[#052856]/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] bg-[#0A3A78]/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main Container */}
-      <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 items-stretch mt-4 mb-4 z-10">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row gap-6 sm:gap-8 items-stretch mt-2 sm:mt-4 mb-2 sm:mb-4 z-10">
 
         {/* LEFT COLUMN: Passport Control Clearance Terminal */}
         <div className="w-full md:w-1/2 flex flex-col justify-center">
@@ -117,74 +117,74 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
           </div>
 
           {/* Holographic Passport Preview Card */}
-          <div className="relative rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-xl relative overflow-hidden passport-inner-bg text-[#0F1D36] flex flex-col justify-between aspect-[1.58/1] min-h-[280px]">
+          <div className="rounded-3xl border border-[#E2E8F0] bg-white p-4 sm:p-6 shadow-xl relative overflow-hidden passport-inner-bg text-[#0F1D36] flex flex-col justify-between aspect-[1.58/1] min-h-[250px] sm:min-h-[280px]">
             {/* Header info */}
-            <div className="flex justify-between items-start border-b border-[#E2E8F0] pb-3 z-10">
-              <div className="text-left">
-                <span className="text-[7px] uppercase tracking-widest text-[#64748B] font-bold block leading-none">
+            <div className="flex justify-between items-start border-b border-[#E2E8F0] pb-2 sm:pb-3 z-10 gap-2 min-w-0">
+              <div className="text-left min-w-0 flex-1">
+                <span className="text-[6px] sm:text-[7px] uppercase tracking-wider sm:tracking-widest text-[#64748B] font-bold block leading-none truncate">
                   University of the Assumption
                 </span>
-                <span className="text-[10px] font-black text-[#052856] tracking-tight block uppercase mt-0.5">
+                <span className="text-[8.5px] sm:text-[10px] font-black text-[#052856] tracking-tight block uppercase mt-0.5 truncate">
                   CIT Freshmen Digital Passport
                 </span>
               </div>
-              <div className="text-right">
-                <span className="text-[7px] uppercase tracking-widest text-[#64748B] font-bold block leading-none">
+              <div className="text-right shrink-0">
+                <span className="text-[6px] sm:text-[7px] uppercase tracking-wider sm:tracking-widest text-[#64748B] font-bold block leading-none">
                   Passport No.
                 </span>
-                <span className="text-[10px] font-mono font-black text-red-600">
+                <span className="text-[8.5px] sm:text-[10px] font-mono font-black text-red-600 block">
                   UA-2026-PENDING
                 </span>
               </div>
             </div>
 
             {/* Central bio grid */}
-            <div className="flex gap-4 items-center mt-3 z-10 flex-1">
+            <div className="flex gap-2.5 sm:gap-4 items-center mt-2.5 sm:mt-3 z-10 flex-1 min-w-0">
               {/* Photo Frame */}
-              <div className="relative w-20 h-24 rounded-xl overflow-hidden border-2 border-[#052856]/20 bg-[#F8FAFC] shadow-inner flex items-center justify-center shrink-0">
+              <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border-2 border-[#052856]/20 bg-[#F8FAFC] shadow-inner flex items-center justify-center shrink-0">
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={avatarUrl} alt="Google Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="h-10 w-10 text-[#64748B]" />
+                  <User className="h-8 w-8 sm:h-10 sm:w-10 text-[#64748B]" />
                 )}
               </div>
 
               {/* Bio Details */}
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[9px] flex-1">
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Surname / Given Names</span>
-                  <span className="font-extrabold text-[#052856] uppercase truncate block max-w-[140px]">
+              <div className="grid grid-cols-2 gap-x-2 sm:gap-x-3 gap-y-1 sm:gap-y-1.5 text-[8px] sm:text-[9px] flex-1 min-w-0">
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Surname / Given Names</span>
+                  <span className="font-extrabold text-[#052856] uppercase truncate block">
                     {fullName}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Email Address</span>
-                  <span className="font-semibold text-[#334155] truncate block max-w-[140px]">
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Email Address</span>
+                  <span className="font-semibold text-[#334155] truncate block" title={email}>
                     {email}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Student ID</span>
-                  <span className="font-mono font-extrabold text-[#052856]">
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Student ID</span>
+                  <span className="font-mono font-extrabold text-[#052856] truncate block">
                     {watchStudentId || 'UA-XXXX-XXX'}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Course / Degree</span>
-                  <span className="font-extrabold text-[#052856] truncate block max-w-[130px]" title={watchCourse}>
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Course / Degree</span>
+                  <span className="font-extrabold text-[#052856] truncate block" title={watchCourse}>
                     {watchCourse || 'Select Course'}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Class Section</span>
-                  <span className="font-extrabold text-[#052856] uppercase">
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Class Section</span>
+                  <span className="font-extrabold text-[#052856] uppercase truncate block">
                     {watchSection || '1-A'}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[6px] text-[#64748B] uppercase block font-bold">Year Level</span>
-                  <span className="font-semibold text-[#334155]">
+                <div className="min-w-0">
+                  <span className="text-[5.5px] sm:text-[6px] text-[#64748B] uppercase block font-bold leading-none mb-0.5">Year Level</span>
+                  <span className="font-semibold text-[#334155] truncate block">
                     {watchYearLevel || '1st Year'}
                   </span>
                 </div>
@@ -195,7 +195,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
             {generateMRZ()}
 
             {/* Red Pending Stamp overlay */}
-            <div className="absolute bottom-12 right-6 border-[3px] border-red-600 text-red-600 font-mono font-black text-[10px] tracking-widest px-3 py-1.5 uppercase rounded transform rotate-[-12deg] pointer-events-none select-none shadow-sm">
+            <div className="absolute bottom-9 right-3 sm:bottom-12 sm:right-6 border-2 sm:border-[3px] border-red-600 text-red-600 font-mono font-black text-[8px] sm:text-[10px] tracking-wider sm:tracking-widest px-2 py-1 sm:px-3 sm:py-1.5 uppercase rounded transform rotate-[-12deg] pointer-events-none select-none shadow-sm z-20">
               PENDING CLEARANCE
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function OnboardingForm({ email, fullName, avatarUrl }: Props) {
               </div>
 
               {/* Row Grid: Section & Year */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-4">
                 {/* Class Section Dropdown */}
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-2">
