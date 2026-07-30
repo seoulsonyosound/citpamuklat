@@ -232,93 +232,95 @@ export default function DashboardClient({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="rounded-3xl p-6 md:p-8 shadow-sm bg-white border border-[#E2E8F0] relative overflow-hidden"
+          className="rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm bg-white border border-[#E2E8F0] relative overflow-hidden"
         >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <span className="text-[9px] uppercase tracking-widest text-[#0A3A78] font-black block leading-none mb-1">
                 Interactive Map
               </span>
-              <h3 className="text-lg font-black tracking-wide text-[#052856] uppercase flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-black tracking-wide text-[#052856] uppercase flex items-center gap-2">
                 <Map className="h-5 w-5 text-[#052856]" /> Campus Tour Trajectory
               </h3>
               <p className="text-xs text-[#475569] font-medium mt-1">
                 {completedCount} of {totalDestinations} Pamuklat clearance stops completed.
               </p>
             </div>
-            <div className="flex items-center gap-4 shrink-0 font-mono">
-              <div className="text-right">
-                <div className="text-[#64748B] text-[10px] uppercase font-bold">Clearance Progress</div>
-                <div className="text-2xl font-black text-[#052856]">{completionPercent}%</div>
+            <div className="flex items-center justify-between w-full sm:w-auto gap-4 shrink-0 font-mono border-t sm:border-t-0 border-[#E2E8F0] pt-3 sm:pt-0">
+              <div className="text-left sm:text-right">
+                <div className="text-[#64748B] text-[9px] sm:text-[10px] uppercase font-bold tracking-wider">Clearance Progress</div>
+                <div className="text-xl sm:text-2xl font-black text-[#052856]">{completionPercent}%</div>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#CBD5E1] bg-[#F8FAFC] flex items-center justify-center text-[#052856] font-bold shadow-sm">
-                <Plane className="h-5 w-5 text-[#052856]" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border border-[#CBD5E1] bg-[#F8FAFC] flex items-center justify-center text-[#052856] font-bold shadow-sm shrink-0">
+                <Plane className="h-4 w-4 sm:h-5 sm:w-5 text-[#052856]" />
               </div>
             </div>
           </div>
 
           {/* Connected Pathway slider */}
-          <div className="relative py-6 mb-2">
-            <div className="absolute left-0 right-0 top-1/2 h-[4px] bg-[#E2E8F0] -translate-y-1/2 rounded-full" />
-            <div
-              className="absolute left-0 top-1/2 h-[4px] bg-gradient-to-r from-[#052856] to-[#0A3A78] -translate-y-1/2 rounded-full transition-all duration-1000 shadow-sm"
-              style={{ width: `${completionPercent}%` }}
-            />
+          <div className="overflow-x-auto pb-4 pt-2 -mx-1 px-3 sm:mx-0 sm:px-2 no-scrollbar">
+            <div className="min-w-[480px] sm:min-w-full relative py-6 my-2">
+              <div className="absolute left-3 right-3 top-1/2 h-[4px] bg-[#E2E8F0] -translate-y-1/2 rounded-full pointer-events-none" />
+              <div
+                className="absolute left-3 top-1/2 h-[4px] bg-gradient-to-r from-[#052856] to-[#0A3A78] -translate-y-1/2 rounded-full transition-all duration-1000 shadow-sm pointer-events-none"
+                style={{ width: `calc((100% - 24px) * ${completionPercent / 100})` }}
+              />
 
-            {/* Moving Airplane symbol */}
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 -ml-4 z-20"
-              style={{ left: `${completionPercent}%` }}
-              animate={{ y: [-2, 2, -2] }}
-              transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-            >
-              <div className="bg-[#052856] border-2 border-white p-2.5 rounded-full text-white shadow-lg transform rotate-90 flex items-center justify-center">
-                <Plane className="h-4 w-4 shrink-0" />
-              </div>
-            </motion.div>
-
-            {/* Checkpoint nodes */}
-            <div className="flex justify-between relative pointer-events-none">
-              <div className="flex flex-col items-center">
-                <div className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white shadow-sm z-10 flex items-center justify-center text-[9px] text-white font-bold">
-                  <Check className="h-3 w-3 text-white" />
+              {/* Moving Airplane symbol */}
+              <motion.div
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 pointer-events-none"
+                style={{ left: `calc(12px + (100% - 24px) * ${completionPercent / 100})` }}
+                animate={{ y: [-2, 2, -2] }}
+                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+              >
+                <div className="bg-[#052856] border-2 border-white p-2 sm:p-2.5 rounded-full text-white shadow-lg transform rotate-90 flex items-center justify-center">
+                  <Plane className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                 </div>
-                <span className="text-[9px] uppercase tracking-wider mt-2.5 font-extrabold text-emerald-700">Start</span>
-              </div>
+              </motion.div>
 
-              {initialDestinations.map((dest, idx) => {
-                const isNodeDone = completedIds.includes(dest.id)
-                return (
-                  <div key={dest.id} className="flex flex-col items-center">
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 transition-all duration-500 z-10 flex items-center justify-center text-[8px] font-bold ${
-                        isNodeDone
-                          ? 'bg-[#052856] border-white text-white shadow-sm'
-                          : 'bg-white border-[#CBD5E1] text-[#64748B]'
-                      }`}
-                    >
-                      {idx + 1}
-                    </div>
-                    <span className={`text-[8px] uppercase mt-2.5 font-black tracking-wider hidden sm:block ${isNodeDone ? 'text-[#052856]' : 'text-[#64748B]'}`}>
-                      Gate 0{idx + 1}
-                    </span>
+              {/* Checkpoint nodes */}
+              <div className="flex justify-between relative pointer-events-none px-0">
+                <div className="flex flex-col items-center">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white shadow-sm z-10 flex items-center justify-center text-[9px] text-white font-bold">
+                    <Check className="h-3 w-3 text-white" />
                   </div>
-                )
-              })}
-
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-5 h-5 rounded-full border-2 transition-all duration-500 z-10 flex items-center justify-center text-[8px] font-bold ${
-                    completionPercent === 100
-                      ? 'bg-emerald-500 border-white text-white shadow-md animate-bounce'
-                      : 'bg-white border-[#CBD5E1] text-[#64748B]'
-                  }`}
-                >
-                  <Award className="h-3 w-3 text-emerald-600" />
+                  <span className="text-[9px] uppercase tracking-wider mt-2.5 font-extrabold text-emerald-700">Start</span>
                 </div>
-                <span className={`text-[9px] uppercase tracking-wider mt-2.5 font-extrabold ${completionPercent === 100 ? 'text-emerald-700' : 'text-[#64748B]'}`}>
-                  Cleared
-                </span>
+
+                {initialDestinations.map((dest, idx) => {
+                  const isNodeDone = completedIds.includes(dest.id)
+                  return (
+                    <div key={dest.id} className="flex flex-col items-center">
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 transition-all duration-500 z-10 flex items-center justify-center text-[8px] font-bold ${
+                          isNodeDone
+                            ? 'bg-[#052856] border-white text-white shadow-sm'
+                            : 'bg-white border-[#CBD5E1] text-[#64748B]'
+                        }`}
+                      >
+                        {idx + 1}
+                      </div>
+                      <span className={`text-[8px] uppercase mt-2.5 font-black tracking-wider hidden sm:block ${isNodeDone ? 'text-[#052856]' : 'text-[#64748B]'}`}>
+                        Gate 0{idx + 1}
+                      </span>
+                    </div>
+                  )
+                })}
+
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 transition-all duration-500 z-10 flex items-center justify-center text-[8px] font-bold ${
+                      completionPercent === 100
+                        ? 'bg-emerald-500 border-white text-white shadow-md animate-bounce'
+                        : 'bg-white border-[#CBD5E1] text-[#64748B]'
+                    }`}
+                  >
+                    <Award className="h-3 w-3 text-emerald-600" />
+                  </div>
+                  <span className={`text-[9px] uppercase tracking-wider mt-2.5 font-extrabold ${completionPercent === 100 ? 'text-emerald-700' : 'text-[#64748B]'}`}>
+                    Cleared
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -347,8 +349,8 @@ export default function DashboardClient({
             <div className="space-y-4">
               {initialDestinations.map((dest, idx) => {
                 const isCompleted = completedIds.includes(dest.id)
-                // All gates are unlocked
-                const isLocked = false
+                // Gate is locked if it is NOT the first gate AND the previous gate is not yet completed
+                const isLocked = idx > 0 && !completedIds.includes(initialDestinations[idx - 1].id)
 
                 return (
                   <motion.div
@@ -356,11 +358,13 @@ export default function DashboardClient({
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    whileHover={{ scale: 1.01, y: -2 }}
+                    whileHover={!isLocked ? { scale: 1.01, y: -2 } : {}}
                     className={`relative overflow-hidden ticket-card transition-all rounded-3xl border shadow-sm ${
-                      isCompleted
-                        ? 'bg-white border-emerald-100 shadow-emerald-50'
-                        : 'bg-white border-[#E2E8F0] hover:shadow-md'
+                      isLocked
+                        ? 'bg-[#F4F6F9] border-[#CBD5E1]'
+                        : isCompleted
+                          ? 'bg-white border-emerald-100 shadow-emerald-50'
+                          : 'bg-white border-[#E2E8F0] hover:shadow-md'
                     }`}
                   >
                     {/* Decorative ticket cutout line */}
@@ -384,14 +388,23 @@ export default function DashboardClient({
                       <div className="md:w-[68%] flex flex-col justify-between space-y-3">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-3">
-                            <span className="p-2.5 rounded-xl shrink-0 shadow-sm border bg-[#F8FAFC] border-[#CBD5E1]">
-                              {renderIcon(dest.icon, dest.destination_color)}
+                            <span className={`p-2.5 rounded-xl shrink-0 shadow-sm border ${
+                              isLocked
+                                ? 'bg-[#F1F5F9] border-[#CBD5E1]'
+                                : 'bg-[#F8FAFC] border-[#CBD5E1]'
+                            }`}>
+                              {isLocked
+                                ? <Lock className="h-5 w-5 text-[#94A3B8]" />
+                                : renderIcon(dest.icon, dest.destination_color)
+                              }
                             </span>
                             <div>
                               <span className="text-[9px] font-mono uppercase tracking-widest text-[#0A3A78] block leading-none font-black">
                                 Pamuklat Stop #{idx + 1}
                               </span>
-                              <h4 className="text-base font-black tracking-tight mt-0.5 text-[#052856]">
+                              <h4 className={`text-base font-black tracking-tight mt-0.5 ${
+                                isLocked ? 'text-[#334155]' : 'text-[#052856]'
+                              }`}>
                                 {dest.title}
                               </h4>
                             </div>
@@ -401,13 +414,19 @@ export default function DashboardClient({
                             <span className="text-[9px] font-mono uppercase tracking-widest text-[#64748B] block leading-none font-bold">
                               Gate
                             </span>
-                            <span className="font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-md border mt-0.5 inline-block bg-[#F8FAFC] border-[#CBD5E1] text-[#052856]">
+                            <span className={`font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-md border mt-0.5 inline-block ${
+                              isLocked
+                                ? 'bg-[#E2E8F0] border-[#CBD5E1] text-[#475569]'
+                                : 'bg-[#F8FAFC] border-[#CBD5E1] text-[#052856]'
+                            }`}>
                               {dest.gate_number}
                             </span>
                           </div>
                         </div>
 
-                        <p className="text-xs font-semibold line-clamp-2 leading-relaxed text-[#334155]">
+                        <p className={`text-xs font-semibold line-clamp-2 leading-relaxed ${
+                          isLocked ? 'text-[#475569]' : 'text-[#334155]'
+                        }`}>
                           {dest.description}
                         </p>
 
@@ -437,6 +456,13 @@ export default function DashboardClient({
                             <span className="text-[8px] font-mono text-[#64748B] uppercase mt-1 font-extrabold">
                               Verified Entry
                             </span>
+                          </div>
+                        ) : isLocked ? (
+                          <div className="flex flex-col items-center gap-2 w-full">
+                            <div className="w-full flex items-center justify-center gap-2 bg-[#E2E8F0] text-[#475569] text-xs font-extrabold uppercase tracking-wider py-3.5 px-4 rounded-xl border border-[#CBD5E1] cursor-not-allowed min-h-[44px]">
+                              <Lock className="h-4 w-4" />
+                              Locked
+                            </div>
                           </div>
                         ) : (
                           <Link href={`/destinations/${dest.id}`} className="w-full">
