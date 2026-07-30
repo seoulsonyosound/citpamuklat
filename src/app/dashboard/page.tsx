@@ -36,9 +36,18 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: true })
 
   // Use DB destinations if available, otherwise fall back to 8 official Pamuklat stops
+  // Sort by gate_number numerically so GATE 01 always = Stop #1
+  const sortByGate = (arr: any[]) =>
+    [...arr].sort((a, b) => {
+      const numA = parseInt((a.gate_number || '0').replace(/\D/g, ''), 10)
+      const numB = parseInt((b.gate_number || '0').replace(/\D/g, ''), 10)
+      return numA - numB
+    })
+
   const activeDestinations = (destinations && destinations.length > 0)
-    ? destinations
+    ? sortByGate(destinations)
     : OFFICIAL_PAMUKLAT_STOPS
+
 
   // 4. Get student completions
   const { data: completions } = await supabase

@@ -359,7 +359,7 @@ export default function DashboardClient({
                     whileHover={!isLocked ? { scale: 1.01, y: -2 } : {}}
                     className={`relative overflow-hidden ticket-card transition-all rounded-3xl border shadow-sm ${
                       isLocked
-                        ? 'bg-[#F8FAFC] border-[#E2E8F0] opacity-70'
+                        ? 'bg-[#F4F6F9] border-[#CBD5E1]'
                         : isCompleted
                           ? 'bg-white border-emerald-100 shadow-emerald-50'
                           : 'bg-white border-[#E2E8F0] hover:shadow-md'
@@ -368,11 +368,11 @@ export default function DashboardClient({
                     {/* Decorative ticket cutout line */}
                     <div className="absolute top-0 bottom-0 left-[72%] border-l-2 border-dashed border-[#E2E8F0] pointer-events-none hidden md:block" />
 
-                    {/* LOCKED OVERLAY BANNER */}
+                    {/* LOCKED BADGE — shows which gate must be cleared first */}
                     {isLocked && (
-                      <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-[#334155]/90 text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-md">
+                      <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-[#1E293B] text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-md">
                         <Lock className="h-3 w-3" />
-                        Complete Gate {idx} First
+                        Complete {initialDestinations[idx - 1]?.gate_number || `Gate ${idx}`} First
                       </div>
                     )}
 
@@ -397,7 +397,7 @@ export default function DashboardClient({
                                 Pamuklat Stop #{idx + 1}
                               </span>
                               <h4 className={`text-base font-black tracking-tight mt-0.5 ${
-                                isLocked ? 'text-[#94A3B8]' : 'text-[#052856]'
+                                isLocked ? 'text-[#334155]' : 'text-[#052856]'
                               }`}>
                                 {dest.title}
                               </h4>
@@ -410,7 +410,7 @@ export default function DashboardClient({
                             </span>
                             <span className={`font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-md border mt-0.5 inline-block ${
                               isLocked
-                                ? 'bg-[#F1F5F9] border-[#CBD5E1] text-[#94A3B8]'
+                                ? 'bg-[#E2E8F0] border-[#CBD5E1] text-[#475569]'
                                 : 'bg-[#F8FAFC] border-[#CBD5E1] text-[#052856]'
                             }`}>
                               {dest.gate_number}
@@ -418,24 +418,24 @@ export default function DashboardClient({
                           </div>
                         </div>
 
-                        <p className={`text-xs font-medium line-clamp-2 leading-relaxed ${
-                          isLocked ? 'text-[#94A3B8]' : 'text-[#334155]'
+                        <p className={`text-xs font-semibold line-clamp-2 leading-relaxed ${
+                          isLocked ? 'text-[#475569]' : 'text-[#334155]'
                         }`}>
                           {isLocked
-                            ? 'This stop is locked. Complete the previous gate to unlock it.'
+                            ? `🔒 Locked — complete ${initialDestinations[idx - 1]?.gate_number || 'the previous gate'} first to unlock this stop.`
                             : dest.description
                           }
                         </p>
 
                         <div className="flex items-center gap-5 text-[10px] font-mono font-extrabold uppercase">
                           <div className={`flex items-center gap-1 ${
-                            isLocked ? 'text-[#94A3B8]' : 'text-[#475569]'
+                            isLocked ? 'text-[#475569]' : 'text-[#475569]'
                           }`}>
                             <Clock className="h-3.5 w-3.5" />
                             <span>Est: {dest.estimated_duration}</span>
                           </div>
                           <div className={`flex items-center gap-1 ${
-                            isLocked ? 'text-[#94A3B8]' : 'text-[#475569]'
+                            isLocked ? 'text-[#475569]' : 'text-[#475569]'
                           }`}>
                             <Compass className="h-3.5 w-3.5" />
                             <span>Rep: {dest.representative}</span>
@@ -460,12 +460,12 @@ export default function DashboardClient({
                           </div>
                         ) : isLocked ? (
                           <div className="flex flex-col items-center gap-2 w-full">
-                            <div className="w-full flex items-center justify-center gap-2 bg-[#E2E8F0] text-[#94A3B8] text-xs font-extrabold uppercase tracking-wider py-3.5 px-4 rounded-xl border border-[#CBD5E1] cursor-not-allowed min-h-[44px]">
+                            <div className="w-full flex items-center justify-center gap-2 bg-[#E2E8F0] text-[#475569] text-xs font-extrabold uppercase tracking-wider py-3.5 px-4 rounded-xl border border-[#CBD5E1] cursor-not-allowed min-h-[44px]">
                               <Lock className="h-4 w-4" />
                               Locked
                             </div>
-                            <span className="text-[9px] font-mono text-[#94A3B8] uppercase font-bold text-center">
-                              Clear Gate {idx} to unlock
+                            <span className="text-[9px] font-mono text-[#475569] uppercase font-bold text-center">
+                              Complete {initialDestinations[idx - 1]?.gate_number || `Gate ${idx}`} to unlock
                             </span>
                           </div>
                         ) : (

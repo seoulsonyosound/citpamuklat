@@ -48,14 +48,24 @@ export default async function DestinationPage({ params }: Props) {
   // 4. Sequential gate lock — fetch all active destinations in order
   const { data: allDestinations } = await serviceSupabase
     .from('destinations')
-    .select('id')
+    .select('id, gate_number')
     .eq('status', 'active')
     .order('created_at', { ascending: true })
 
   // Fall back to official stops order if DB is empty
-  const orderedIds = (allDestinations && allDestinations.length > 0)
-    ? allDestinations.map((d: { id: string }) => d.id)
+  // Sort by gate_number numerically for consistent ordering
+  const sortedDestinations = (allDestinations && allDestinations.length > 0)
+    ? [...allDestinations].sort((a: any, b: any) => {
+        const numA = parseInt((a.gate_number || '0').replace(/\D/g, ''), 10)
+        const numB = parseInt((b.gate_number || '0').replace(/\D/g, ''), 10)
+        return numA - numB
+      })
+    : null
+
+  const orderedIds = sortedDestinations
+    ? sortedDestinations.map((d: { id: string }) => d.id)
     : OFFICIAL_PAMUKLAT_STOPS.map((s) => s.id)
+
 
   const destIndex = orderedIds.findIndex((did: string) => did === id)
 
