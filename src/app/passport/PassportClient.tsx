@@ -412,18 +412,8 @@ export default function PassportClient({ profile, destinations, completions }: P
                       <ArrowLeft className="h-3 w-3" /> Close Cover
                     </button>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleDownloadPassport('png')}
-                        disabled={downloading}
-                        className="flex items-center gap-1 bg-[#052856] hover:bg-[#031D40] text-white font-extrabold text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer disabled:opacity-50"
-                      >
-                        <Download className="h-3 w-3 text-white" />
-                        {downloading ? 'Exporting...' : 'Download Passport'}
-                      </button>
-                      <div className="hidden sm:flex items-center gap-1 text-[8px] text-[#78614E] font-bold uppercase">
-                        <ShieldCheck className="h-3.5 w-3.5 text-indigo-900" /> Biometric Secured
-                      </div>
+                    <div className="flex items-center gap-1 text-[8px] text-[#78614E] font-bold uppercase">
+                      <ShieldCheck className="h-3.5 w-3.5 text-indigo-900" /> Biometric Secured
                     </div>
                   </div>
                 </div>
