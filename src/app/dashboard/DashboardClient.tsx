@@ -347,8 +347,8 @@ export default function DashboardClient({
             <div className="space-y-4">
               {initialDestinations.map((dest, idx) => {
                 const isCompleted = completedIds.includes(dest.id)
-                // Gate is locked if it is NOT the first gate AND the previous gate is not yet completed
-                const isLocked = idx > 0 && !completedIds.includes(initialDestinations[idx - 1].id)
+                // All gates are unlocked
+                const isLocked = false
 
                 return (
                   <motion.div
@@ -356,23 +356,25 @@ export default function DashboardClient({
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    whileHover={!isLocked ? { scale: 1.01, y: -2 } : {}}
+                    whileHover={{ scale: 1.01, y: -2 }}
                     className={`relative overflow-hidden ticket-card transition-all rounded-3xl border shadow-sm ${
-                      isLocked
-                        ? 'bg-[#F4F6F9] border-[#CBD5E1]'
-                        : isCompleted
-                          ? 'bg-white border-emerald-100 shadow-emerald-50'
-                          : 'bg-white border-[#E2E8F0] hover:shadow-md'
+                      isCompleted
+                        ? 'bg-white border-emerald-100 shadow-emerald-50'
+                        : 'bg-white border-[#E2E8F0] hover:shadow-md'
                     }`}
                   >
                     {/* Decorative ticket cutout line */}
                     <div className="absolute top-0 bottom-0 left-[72%] border-l-2 border-dashed border-[#E2E8F0] pointer-events-none hidden md:block" />
 
-                    {/* LOCKED BADGE — shows which gate must be cleared first */}
-                    {isLocked && (
-                      <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-[#1E293B] text-white px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-md">
-                        <Lock className="h-3 w-3" />
-                        Complete {initialDestinations[idx - 1]?.gate_number || `Gate ${idx}`} First
+                    {/* GATE COVER IMAGE (if present) */}
+                    {dest.stamp_image_url && (
+                      <div className="w-full h-36 md:h-44 overflow-hidden border-b border-[#E2E8F0] relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={dest.stamp_image_url} alt={dest.title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#052856]/40 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute bottom-3 left-4 text-white text-[9px] font-mono font-extrabold uppercase bg-[#052856]/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
+                          {dest.gate_number} Station View
+                        </div>
                       </div>
                     )}
 
@@ -382,23 +384,14 @@ export default function DashboardClient({
                       <div className="md:w-[68%] flex flex-col justify-between space-y-3">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-3">
-                            <span className={`p-2.5 rounded-xl shrink-0 shadow-sm border ${
-                              isLocked
-                                ? 'bg-[#F1F5F9] border-[#CBD5E1]'
-                                : 'bg-[#F8FAFC] border-[#CBD5E1]'
-                            }`}>
-                              {isLocked
-                                ? <Lock className="h-5 w-5 text-[#94A3B8]" />
-                                : renderIcon(dest.icon, dest.destination_color)
-                              }
+                            <span className="p-2.5 rounded-xl shrink-0 shadow-sm border bg-[#F8FAFC] border-[#CBD5E1]">
+                              {renderIcon(dest.icon, dest.destination_color)}
                             </span>
                             <div>
                               <span className="text-[9px] font-mono uppercase tracking-widest text-[#0A3A78] block leading-none font-black">
                                 Pamuklat Stop #{idx + 1}
                               </span>
-                              <h4 className={`text-base font-black tracking-tight mt-0.5 ${
-                                isLocked ? 'text-[#334155]' : 'text-[#052856]'
-                              }`}>
+                              <h4 className="text-base font-black tracking-tight mt-0.5 text-[#052856]">
                                 {dest.title}
                               </h4>
                             </div>
@@ -408,35 +401,22 @@ export default function DashboardClient({
                             <span className="text-[9px] font-mono uppercase tracking-widest text-[#64748B] block leading-none font-bold">
                               Gate
                             </span>
-                            <span className={`font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-md border mt-0.5 inline-block ${
-                              isLocked
-                                ? 'bg-[#E2E8F0] border-[#CBD5E1] text-[#475569]'
-                                : 'bg-[#F8FAFC] border-[#CBD5E1] text-[#052856]'
-                            }`}>
+                            <span className="font-mono font-extrabold text-xs px-2.5 py-0.5 rounded-md border mt-0.5 inline-block bg-[#F8FAFC] border-[#CBD5E1] text-[#052856]">
                               {dest.gate_number}
                             </span>
                           </div>
                         </div>
 
-                        <p className={`text-xs font-semibold line-clamp-2 leading-relaxed ${
-                          isLocked ? 'text-[#475569]' : 'text-[#334155]'
-                        }`}>
-                          {isLocked
-                            ? `🔒 Locked — complete ${initialDestinations[idx - 1]?.gate_number || 'the previous gate'} first to unlock this stop.`
-                            : dest.description
-                          }
+                        <p className="text-xs font-semibold line-clamp-2 leading-relaxed text-[#334155]">
+                          {dest.description}
                         </p>
 
                         <div className="flex items-center gap-5 text-[10px] font-mono font-extrabold uppercase">
-                          <div className={`flex items-center gap-1 ${
-                            isLocked ? 'text-[#475569]' : 'text-[#475569]'
-                          }`}>
+                          <div className="flex items-center gap-1 text-[#475569]">
                             <Clock className="h-3.5 w-3.5" />
                             <span>Est: {dest.estimated_duration}</span>
                           </div>
-                          <div className={`flex items-center gap-1 ${
-                            isLocked ? 'text-[#475569]' : 'text-[#475569]'
-                          }`}>
+                          <div className="flex items-center gap-1 text-[#475569]">
                             <Compass className="h-3.5 w-3.5" />
                             <span>Rep: {dest.representative}</span>
                           </div>
@@ -456,16 +436,6 @@ export default function DashboardClient({
                             </motion.div>
                             <span className="text-[8px] font-mono text-[#64748B] uppercase mt-1 font-extrabold">
                               Verified Entry
-                            </span>
-                          </div>
-                        ) : isLocked ? (
-                          <div className="flex flex-col items-center gap-2 w-full">
-                            <div className="w-full flex items-center justify-center gap-2 bg-[#E2E8F0] text-[#475569] text-xs font-extrabold uppercase tracking-wider py-3.5 px-4 rounded-xl border border-[#CBD5E1] cursor-not-allowed min-h-[44px]">
-                              <Lock className="h-4 w-4" />
-                              Locked
-                            </div>
-                            <span className="text-[9px] font-mono text-[#475569] uppercase font-bold text-center">
-                              Complete {initialDestinations[idx - 1]?.gate_number || `Gate ${idx}`} to unlock
                             </span>
                           </div>
                         ) : (

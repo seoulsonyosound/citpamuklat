@@ -64,21 +64,6 @@ export default async function DestinationPage({ params }: Props) {
   const orderedIds = sortedDestinations.map((d: { id: string }) => d.id)
   const destIndex = orderedIds.findIndex((did: string) => did === id)
 
-  // If this is NOT the first gate, verify the previous gate is completed
-  if (destIndex > 0) {
-    const prevDestId = orderedIds[destIndex - 1]
-    const { data: prevCompletion } = await supabase
-      .from('student_destinations')
-      .select('id')
-      .eq('student_id', user.id)
-      .eq('destination_id', prevDestId)
-      .maybeSingle()
-
-    if (!prevCompletion) {
-      // Previous gate not yet completed — redirect back to dashboard
-      redirect('/dashboard')
-    }
-  }
 
   // 5. Determine the NEXT gate (if any) to show in the post-scan prompt
   const nextDest = destIndex >= 0 && destIndex < sortedDestinations.length - 1

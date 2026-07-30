@@ -293,6 +293,18 @@ export default function DestinationDetailsClient({
           transition={{ duration: 0.5 }}
           className="relative bg-white rounded-3xl shadow-xl border border-[#E2E8F0] overflow-hidden"
         >
+          {/* GATE BANNER IMAGE (if available) */}
+          {destination.stamp_image_url && (
+            <div className="w-full h-44 sm:h-52 overflow-hidden border-b border-[#E2E8F0] relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={destination.stamp_image_url} alt={destination.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#052856]/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-4 text-white text-[9.5px] font-mono font-black uppercase bg-[#052856]/85 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20">
+                {destination.gate_number} Station Photo
+              </div>
+            </div>
+          )}
+
           {/* PASSENGER HEADER */}
           <div className="p-6 border-b-2 border-dashed border-[#E2E8F0] relative">
             <div className="flex justify-between items-center">
