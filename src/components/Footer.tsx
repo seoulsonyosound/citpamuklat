@@ -37,7 +37,7 @@ export default function Footer() {
       {/* CANDABA GURLZ & Credits */}
       <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-right">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#052856] text-white text-[10px] font-black uppercase tracking-widest shadow-md border border-[#0A3A78]">
-          <span>CANDABA GURLZ</span>
+          <span>CANDABA GIRLZ</span>
         </div>
         <span className="text-[11px] font-bold text-[#5A6B85] tracking-tight">
           University of the Assumption • CIT PAMUKLAT 2026
