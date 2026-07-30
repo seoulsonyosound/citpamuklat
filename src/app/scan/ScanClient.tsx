@@ -189,17 +189,28 @@ export default function ScanClient() {
     })
   }
 
+  const handleExitClick = () => {
+    if (typeof window !== 'undefined' && window.history.length > 2) {
+      router.back()
+    } else {
+      router.push('/dashboard')
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-[#F5F7FB] text-[#0F1D36] flex flex-col pb-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F4F6F9] text-[#0F1D36] flex flex-col pb-12 relative overflow-hidden">
       <Navbar />
 
       <main className="max-w-md mx-auto px-4 py-8 flex-1 w-full flex flex-col justify-center relative z-10">
 
         {/* Navigation title */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/dashboard" className="flex items-center gap-1.5 text-xs text-[#5A6B85] hover:text-[#0F1D36] transition-colors uppercase tracking-widest font-mono cursor-pointer font-bold">
+          <button
+            onClick={handleExitClick}
+            className="flex items-center gap-1.5 text-xs text-[#052856] hover:text-[#031D40] transition-colors uppercase tracking-widest font-mono cursor-pointer font-black"
+          >
             <ArrowLeft className="h-4 w-4" /> Exit Scanner
-          </Link>
+          </button>
 
           <button
             onClick={() => setManualInput(!manualInput)}
