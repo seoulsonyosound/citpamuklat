@@ -79,9 +79,6 @@ export default function DestinationDetailsClient({
   const [scanError, setScanError] = useState<string | null>(null)
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null)
 
-  // Next gate modal — shown after successful scan
-  const [showNextGateModal, setShowNextGateModal] = useState(false)
-
   // Manual code entry fallback
   const [manualInput, setManualInput] = useState(false)
   const [manualToken, setManualToken] = useState('')
@@ -208,10 +205,6 @@ export default function DestinationDetailsClient({
         setLocalCompleted(true)
         setLoadingScan(false)
         triggerConfetti()
-        // Show next gate modal after brief celebration delay
-        if (nextDestination) {
-          setTimeout(() => setShowNextGateModal(true), 1200)
-        }
       }
     } catch (err: any) {
       setScanError(err.message || 'An unexpected verification error occurred.')
@@ -443,8 +436,8 @@ export default function DestinationDetailsClient({
                   {completionDate ? new Date(completionDate).toLocaleDateString() : 'Verified Gate Entry'}
                 </div>
 
-                {/* Next gate inline prompt if modal was dismissed */}
-                {nextDestination && !showNextGateModal && (
+                {/* Next gate inline prompt */}
+                {nextDestination && (
                   <button
                     onClick={handleGoToNextGate}
                     className="mt-4 flex items-center gap-2 bg-[#052856] text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl cursor-pointer hover:bg-[#031D40] transition-colors"
@@ -529,89 +522,7 @@ export default function DestinationDetailsClient({
 
       </main>
 
-      {/* ════════════════════════════════════════════════════
-          NEXT GATE MODAL — pops up after successful scan
-      ════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {showNextGateModal && nextDestination && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-              onClick={() => setShowNextGateModal(false)}
-            />
 
-            {/* Modal Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85, y: 60 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 40 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 260 }}
-              className="fixed inset-x-4 bottom-6 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[400px] z-50 bg-white rounded-3xl shadow-2xl border border-[#E2E8F0] overflow-hidden"
-            >
-              {/* Green success top bar */}
-              <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4 flex items-center gap-3">
-                <div className="bg-white/20 p-2 rounded-xl">
-                  <ShieldCheck className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <div className="text-white font-black text-sm uppercase tracking-wider">Stamp Collected! ✓</div>
-                  <div className="text-emerald-100 text-[10px] font-bold uppercase tracking-widest">
-                    {destination.gate_number} cleared successfully
-                  </div>
-                </div>
-              </div>
-
-              {/* Next gate info */}
-              <div className="px-6 py-5 space-y-4">
-                <div>
-                  <p className="text-[10px] font-black text-[#475569] uppercase tracking-widest mb-1">Next Stop</p>
-                  <div className="flex items-center gap-3 bg-[#F4F6F9] border border-[#E2E8F0] rounded-2xl p-4">
-                    <div className="bg-[#052856] text-white p-2.5 rounded-xl shrink-0">
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[9px] font-mono font-black text-[#0A3A78] uppercase tracking-widest">
-                        {nextDestination.gate_number}
-                      </div>
-                      <div className="font-black text-sm text-[#052856] truncate">
-                        {nextDestination.title}
-                      </div>
-                    </div>
-                    <div className="shrink-0">
-                      <ChevronRight className="h-4 w-4 text-[#052856]" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* CTA Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowNextGateModal(false)}
-                    className="flex-1 py-3.5 rounded-2xl border border-[#E2E8F0] text-[#475569] text-xs font-extrabold uppercase tracking-wider hover:bg-[#F4F6F9] transition-colors cursor-pointer min-h-[44px]"
-                  >
-                    Stay Here
-                  </button>
-                  <button
-                    onClick={handleGoToNextGate}
-                    className="flex-2 flex-grow-[2] py-3.5 px-5 rounded-2xl bg-[#052856] hover:bg-[#031D40] text-white text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#052856]/20 cursor-pointer transition-colors min-h-[44px]"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                    Go to {nextDestination.gate_number}
-                  </button>
-                </div>
-
-                <p className="text-center text-[9px] font-mono text-[#94A3B8] uppercase tracking-wider">
-                  Tap outside to dismiss
-                </p>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Sticky/Fixed bottom panel for next gate navigation if completed */}
       {localCompleted && nextDestination && (
