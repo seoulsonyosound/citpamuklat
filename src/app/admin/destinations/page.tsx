@@ -16,16 +16,25 @@ export default async function AdminDestinationsPage() {
     redirect('/admin/login')
   }
 
-  // 2. Fetch all destinations
+  // 2. Fetch all destinations and sort by gate_number numerically
   const supabase = createServiceRoleClient()
   const { data: destinations } = await supabase
     .from('destinations')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
+
+  // Sort by gate_number numerically so GATE 01 always appears first
+  const sortByGate = (arr: any[]) =>
+    [...arr].sort((a, b) => {
+      const numA = parseInt((a.gate_number || '0').replace(/\D/g, ''), 10)
+      const numB = parseInt((b.gate_number || '0').replace(/\D/g, ''), 10)
+      return numA - numB
+    })
 
   const initialDestinations = (destinations && destinations.length > 0)
-    ? destinations
+    ? sortByGate(destinations)
     : OFFICIAL_PAMUKLAT_STOPS
+
 
   return (
     <DestinationsClient
