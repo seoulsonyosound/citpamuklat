@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, MapPin, QrCode, X, Clock, Compass, Search, ShieldAlert } from 'lucide-react'
+import { Plus, Edit2, Trash2, MapPin, QrCode, X, Clock, Compass, Search, ShieldAlert, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import AdminNavbar from '@/components/AdminNavbar'
 import { saveDestinationAction, deleteDestinationAction, regenerateQRAction } from '@/app/actions/destinationActions'
 import QRCode from 'qrcode'
@@ -33,11 +33,26 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Custom Modal States (Replaces native browser alert/confirm)
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean
+    type: 'regenerate_qr' | 'delete_gate'
+    dest: Destination | null
+  }>({ isOpen: false, type: 'regenerate_qr', dest: null })
+
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    isError?: boolean
+  }>({ isOpen: false, title: '', message: '' })
+
   // QR Code Modal states
   const [showQRModal, setShowQRModal] = useState<boolean>(false)
   const [qrToken, setQrToken] = useState<string | null>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
   const [qrModalTitle, setQrModalTitle] = useState<string>('')
+  const [qrGateNumber, setQrGateNumber] = useState<string>('')
 
   // Form states
   const [formTitle, setFormTitle] = useState('')
@@ -104,19 +119,36 @@ export default function DestinationsClient({ initialDestinations }: Props) {
     try {
       const result = await saveDestinationAction(payload)
       if (result.error) {
-        alert(result.error)
+        setAlertModal({
+          isOpen: true,
+          title: 'Gate Save Error',
+          message: result.error,
+          isError: true,
+        })
       } else {
         if (result.rawToken) {
           setQrToken(result.rawToken)
           setQrModalTitle(formTitle)
-          const dataUrl = await QRCode.toDataURL(result.rawToken, { width: 300, margin: 2 })
+          setQrGateNumber(formGate)
+          const dataUrl = await QRCode.toDataURL(result.rawToken, { width: 320, margin: 2 })
           setQrCodeUrl(dataUrl)
           setShowQRModal(true)
+        } else {
+          setAlertModal({
+            isOpen: true,
+            title: 'Flight Gate Saved',
+            message: `Successfully saved ${formTitle} (Gate ${formGate}).`,
+          })
         }
         window.location.reload()
       }
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      setAlertModal({
+        isOpen: true,
+        title: 'Unexpected Error',
+        message: err?.message || 'An unexpected error occurred while saving the gate.',
+        isError: true,
+      })
     } finally {
       setSaving(false)
       setIsFormOpen(false)
@@ -124,35 +156,83 @@ export default function DestinationsClient({ initialDestinations }: Props) {
     }
   }
 
-  // Handle Delete
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this gate destination? This action is permanent and clears completions records.')) return
-
-    const result = await deleteDestinationAction(id)
-    if (result.error) {
-      alert(result.error)
-    } else {
-      setDestinations(prev => prev.filter(d => d.id !== id))
-    }
+  // Trigger Confirmation Modal for QR Regeneration
+  const promptRegenerateQR = (dest: Destination) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'regenerate_qr',
+      dest,
+    })
   }
 
-  // Handle QR Regeneration
-  const handleRegenerateQR = async (dest: Destination) => {
-    if (!confirm(`Regenerating QR code for ${dest.title} invalidates the previous QR. Representatives must print the new QR immediately. Proceed?`)) return
+  // Trigger Confirmation Modal for Delete
+  const promptDeleteGate = (dest: Destination) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'delete_gate',
+      dest,
+    })
+  }
 
-    try {
-      const result = await regenerateQRAction(dest.id)
-      if (result.error) {
-        alert(result.error)
-      } else if (result.rawToken) {
-        setQrToken(result.rawToken)
-        setQrModalTitle(dest.title)
-        const dataUrl = await QRCode.toDataURL(result.rawToken, { width: 300, margin: 2 })
-        setQrCodeUrl(dataUrl)
-        setShowQRModal(true)
+  // Execute confirmed action
+  const handleConfirmAction = async () => {
+    const { type, dest } = confirmModal
+    if (!dest) return
+
+    setConfirmModal({ isOpen: false, type: 'regenerate_qr', dest: null })
+
+    if (type === 'regenerate_qr') {
+      try {
+        const result = await regenerateQRAction(dest.id, dest.gate_number)
+        if (result.error) {
+          setAlertModal({
+            isOpen: true,
+            title: 'QR Generation Failed',
+            message: result.error,
+            isError: true,
+          })
+        } else if (result.rawToken) {
+          setQrToken(result.rawToken)
+          setQrModalTitle(dest.title)
+          setQrGateNumber(dest.gate_number)
+          const dataUrl = await QRCode.toDataURL(result.rawToken, { width: 320, margin: 2 })
+          setQrCodeUrl(dataUrl)
+          setShowQRModal(true)
+        }
+      } catch (err: any) {
+        setAlertModal({
+          isOpen: true,
+          title: 'QR Error',
+          message: err?.message || 'Failed to generate QR token.',
+          isError: true,
+        })
       }
-    } catch (err) {
-      console.error(err)
+    } else if (type === 'delete_gate') {
+      try {
+        const result = await deleteDestinationAction(dest.id)
+        if (result.error) {
+          setAlertModal({
+            isOpen: true,
+            title: 'Delete Failed',
+            message: result.error,
+            isError: true,
+          })
+        } else {
+          setDestinations(prev => prev.filter(d => d.id !== dest.id))
+          setAlertModal({
+            isOpen: true,
+            title: 'Gate Deleted',
+            message: `${dest.title} has been permanently removed from operations directory.`,
+          })
+        }
+      } catch (err: any) {
+        setAlertModal({
+          isOpen: true,
+          title: 'Delete Error',
+          message: err?.message || 'Failed to delete destination.',
+          isError: true,
+        })
+      }
     }
   }
 
@@ -242,7 +322,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
 
                   {/* Gate Number Badge */}
                   <div className="absolute top-3 left-3 bg-[#052856] text-white font-mono text-[10px] font-black uppercase px-3 py-1 rounded-xl shadow-md border border-[#0A3A78]">
-                    Gate {dest.gate_number}
+                    {dest.gate_number}
                   </div>
 
                   {/* Stamp Color Dot */}
@@ -287,7 +367,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
               {/* Actions Footer */}
               <div className="p-4 bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between gap-2">
                 <button
-                  onClick={() => handleRegenerateQR(dest)}
+                  onClick={() => promptRegenerateQR(dest)}
                   className="flex items-center gap-1.5 bg-[#052856] hover:bg-[#031D40] text-white text-[10px] font-extrabold uppercase tracking-wider px-3.5 py-2 rounded-xl transition-colors shadow-sm cursor-pointer"
                 >
                   <QrCode className="h-3.5 w-3.5" /> Stamp Token QR
@@ -302,7 +382,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                     <Edit2 className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(dest.id)}
+                    onClick={() => promptDeleteGate(dest)}
                     className="p-2 text-[#475569] hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-red-200"
                     title="Delete Gate"
                   >
@@ -320,6 +400,95 @@ export default function DestinationsClient({ initialDestinations }: Props) {
             </div>
           )}
         </section>
+
+        {/* CUSTOM REGENERATE / DELETE CONFIRMATION MODAL */}
+        <AnimatePresence>
+          {confirmModal.isOpen && confirmModal.dest && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-[#E2E8F0] shadow-2xl space-y-6 relative text-[#0F1D36]"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-2xl shrink-0 ${confirmModal.type === 'delete_gate' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-[#052856] border border-blue-200'}`}>
+                    {confirmModal.type === 'delete_gate' ? <Trash2 className="h-6 w-6" /> : <QrCode className="h-6 w-6" />}
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-mono text-[#0A3A78] font-black uppercase tracking-widest block">
+                      {confirmModal.type === 'delete_gate' ? 'Permanent Removal' : 'QR Token Refresh'}
+                    </span>
+                    <h3 className="text-lg font-black text-[#052856] uppercase mt-0.5">
+                      {confirmModal.type === 'delete_gate' ? 'Delete Flight Gate?' : 'Regenerate QR Token?'}
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="text-xs text-[#475569] font-medium leading-relaxed bg-[#F8FAFC] p-4 rounded-2xl border border-[#E2E8F0]">
+                  {confirmModal.type === 'delete_gate' ? (
+                    <>Are you sure you want to delete <strong>{confirmModal.dest.title}</strong>? This action is permanent and clears student completion records for this stop.</>
+                  ) : (
+                    <>Regenerating the QR clearance token for <strong>{confirmModal.dest.title}</strong> invalidates the previous QR. Booth representatives must display the newly generated QR code immediately.</>
+                  )}
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    onClick={() => setConfirmModal({ isOpen: false, type: 'regenerate_qr', dest: null })}
+                    className="px-5 py-3 bg-[#F1F5F9] border border-[#CBD5E1] text-[#475569] font-extrabold text-xs uppercase rounded-xl hover:bg-[#E2E8F0] transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmAction}
+                    className={`px-5 py-3 text-white font-extrabold text-xs uppercase rounded-xl shadow-md transition-colors cursor-pointer ${
+                      confirmModal.type === 'delete_gate'
+                        ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
+                        : 'bg-[#052856] hover:bg-[#031D40] shadow-[#052856]/20'
+                    }`}
+                  >
+                    {confirmModal.type === 'delete_gate' ? 'Confirm Delete' : 'Generate New QR'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* CUSTOM ALERT MODAL */}
+        <AnimatePresence>
+          {alertModal.isOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full border border-[#E2E8F0] shadow-2xl text-center space-y-5 relative text-[#0F1D36]"
+              >
+                <div className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center ${alertModal.isError ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`}>
+                  {alertModal.isError ? <AlertTriangle className="h-7 w-7" /> : <CheckCircle2 className="h-7 w-7" />}
+                </div>
+
+                <div>
+                  <h3 className="text-base font-black text-[#052856] uppercase">
+                    {alertModal.title}
+                  </h3>
+                  <p className="text-xs text-[#475569] font-medium leading-relaxed mt-2">
+                    {alertModal.message}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setAlertModal({ isOpen: false, title: '', message: '' })}
+                  className="w-full bg-[#052856] text-white font-extrabold text-xs uppercase py-3 rounded-xl hover:bg-[#031D40] transition-colors shadow-md"
+                >
+                  Understand
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* QR CODE TOKEN DISPLAY MODAL */}
         <AnimatePresence>
@@ -345,19 +514,24 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                   <h3 className="text-lg font-black text-[#052856] uppercase mt-1">
                     {qrModalTitle}
                   </h3>
+                  {qrGateNumber && (
+                    <span className="inline-block bg-[#052856] text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md mt-1">
+                      {qrGateNumber}
+                    </span>
+                  )}
                 </div>
 
                 {/* QR Image Box */}
                 {qrCodeUrl && (
-                  <div className="bg-[#F8FAFC] p-4 rounded-2xl border-2 border-dashed border-[#CBD5E1] inline-block">
+                  <div className="bg-[#F8FAFC] p-4 rounded-2xl border-2 border-dashed border-[#CBD5E1] inline-block shadow-inner">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qrCodeUrl} alt="Secure QR Code" className="w-48 h-48 mx-auto" />
+                    <img src={qrCodeUrl} alt="Secure QR Code" className="w-52 h-52 mx-auto" />
                   </div>
                 )}
 
                 <div className="space-y-3">
                   <p className="text-[10px] text-[#475569] font-medium leading-relaxed">
-                    Representatives display this QR code at their activity booth. Freshmen scan this to stamp their passports.
+                    Display this QR code at your activity booth. Freshmen scan this token with their mobile camera to collect their stamp.
                   </p>
 
                   {qrToken && (
@@ -373,7 +547,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
 
                 <button
                   onClick={() => setShowQRModal(false)}
-                  className="w-full bg-[#052856] text-white font-extrabold text-xs uppercase py-3 rounded-xl hover:bg-[#031D40] transition-colors"
+                  className="w-full bg-[#052856] text-white font-extrabold text-xs uppercase py-3 rounded-xl hover:bg-[#031D40] transition-colors shadow-md"
                 >
                   Close Window
                 </button>
@@ -436,7 +610,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                           required
                           value={formGate}
                           onChange={(e) => setFormGate(e.target.value)}
-                          placeholder="e.g. G-01"
+                          placeholder="e.g. GATE 01"
                           className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-mono font-semibold"
                         />
                       </div>
