@@ -2,10 +2,20 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const requestUrl = new URL(request.url)
+  const searchParams = requestUrl.searchParams
   const code = searchParams.get('code')
-  // next parameter allows deep-linking after sign-in
   const next = searchParams.get('next') || '/dashboard'
+
+  // Determine dynamic origin safely for Vercel/mobile deployments
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto')
+  
+  let origin = requestUrl.origin
+  if (forwardedHost) {
+    const proto = forwardedProto || 'https'
+    origin = `${proto}://${forwardedHost}`
+  }
 
   if (code) {
     const supabase = await createClient()
