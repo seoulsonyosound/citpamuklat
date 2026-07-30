@@ -3,6 +3,7 @@
 import { createHash } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceRoleClient } from '@/lib/supabase/serviceRole'
+import { revalidatePath } from 'next/cache'
 
 /**
  * Validates a scanned QR token against active destinations.
@@ -17,25 +18,35 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     return { error: 'Authentication required.' }
   }
 
-  if (!token || token.trim() === '') {
-    return { error: 'Invalid boarding pass token.' }
-  }
-
-  // 2. Hash the scanned raw token using SHA-256
-  const tokenHash = createHash('sha256').update(token).digest('hex')
+  const cleanToken = token.trim()
+  const tokenHash = createHash('sha256').update(cleanToken).digest('hex')
 
   // Use service role client to select qr_token_hash since it's hidden under RLS
   const serviceSupabase = createServiceRoleClient()
 
   // 3. Find matched active destination
-  const { data: destination, error: destError } = await serviceSupabase
+  let { data: destination } = await serviceSupabase
     .from('destinations')
     .select('*')
     .eq('qr_token_hash', tokenHash)
     .eq('status', 'active')
-    .single()
+    .maybeSingle()
 
-  if (destError || !destination) {
+  if (!destination) {
+    // Fallback check if cleanToken directly matches id or gate_number (e.g. GATE 01)
+    const { data: destByFallback } = await serviceSupabase
+      .from('destinations')
+      .select('*')
+      .or(`id.eq.${cleanToken},gate_number.ilike.${cleanToken}`)
+      .eq('status', 'active')
+      .maybeSingle()
+
+    if (destByFallback) {
+      destination = destByFallback
+    }
+  }
+
+  if (!destination) {
     // Write failed scan log
     await supabase.from('scan_logs').insert({
       student_id: user.id,
@@ -111,6 +122,11 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     title: 'Passport Stamped!',
     message: `Verification complete: You have successfully cleared ${destination.title} (Gate ${destination.gate_number}) and earned your stamp.`,
   })
+
+  revalidatePath('/dashboard')
+  revalidatePath('/passport')
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/students')
 
   return { 
     success: true, 
@@ -242,6 +258,11 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     title: 'Passport Stamped by Admin!',
     message: `Verification complete: ${destination.title} (Gate ${destination.gate_number}) has been stamped into your Digital Passport by booth staff.`,
   })
+
+  revalidatePath('/dashboard')
+  revalidatePath('/passport')
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/students')
 
   return {
     success: true,
