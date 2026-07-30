@@ -50,40 +50,42 @@ export default function PassportClient({ profile, destinations, completions }: P
     setDownloading(true)
 
     try {
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(passportRef.current, {
-        useCORS: true,
-        allowTaint: true,
+      const { toPng } = await import('html-to-image')
+      const dataUrl = await toPng(passportRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
         backgroundColor: '#F5F7FB',
-        logging: false,
-        scale: 2,
-      } as any)
+      })
 
       const cleanStudentId = profile.student_id ? profile.student_id.replace(/[^a-z0-9]/gi, '_') : 'passport'
       const filename = `CIT_Passport_${profile.full_name.replace(/\s+/g, '_')}_${cleanStudentId}`
 
       if (format === 'png') {
-        const image = canvas.toDataURL('image/png')
         const link = document.createElement('a')
-        link.href = image
+        link.href = dataUrl
         link.download = `${filename}.png`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
       } else {
         const jsPDF = (await import('jspdf')).default
-        const imgData = canvas.toDataURL('image/png')
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'px',
-          format: [canvas.width, canvas.height],
+        const img = new Image()
+        img.src = dataUrl
+        await new Promise((res) => {
+          img.onload = res
         })
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+
+        const pdf = new jsPDF({
+          orientation: img.width > img.height ? 'landscape' : 'portrait',
+          unit: 'px',
+          format: [img.width, img.height],
+        })
+        pdf.addImage(dataUrl, 'PNG', 0, 0, img.width, img.height)
         pdf.save(`${filename}.pdf`)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to generate downloadable passport:', err)
-      alert('Could not generate passport download. Please try again.')
+      alert(`Could not generate passport download: ${err?.message || 'Unexpected error'}`)
     } finally {
       setDownloading(false)
     }
