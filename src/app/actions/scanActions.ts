@@ -15,16 +15,16 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
   // 1. Authenticate user
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
-    return { error: 'Authentication required.' }
+    return { error: 'Authentication required. Please sign in to scan.' }
   }
 
   const cleanToken = token.trim()
   const tokenHash = createHash('sha256').update(cleanToken).digest('hex')
 
-  // Use service role client to select qr_token_hash since it's hidden under RLS
+  // Use service role client to bypass RLS policies for completions and logs
   const serviceSupabase = createServiceRoleClient()
 
-  // 3. Find matched active destination
+  // 2. Find matched active destination by tokenHash or fallback
   let { data: destination } = await serviceSupabase
     .from('destinations')
     .select('*')
@@ -48,7 +48,7 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
 
   if (!destination) {
     // Write failed scan log
-    await supabase.from('scan_logs').insert({
+    await serviceSupabase.from('scan_logs').insert({
       student_id: user.id,
       destination_id: expectedDestinationId || '00000000-0000-0000-0000-000000000000',
       status: 'failed',
@@ -57,9 +57,9 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     return { error: 'Access Denied: Invalid or expired gate token.' }
   }
 
-  // 4. Validate gate target if student clicked from a specific destination page
+  // 3. Validate gate target if student clicked from a specific destination page
   if (expectedDestinationId && destination.id !== expectedDestinationId) {
-    await supabase.from('scan_logs').insert({
+    await serviceSupabase.from('scan_logs').insert({
       student_id: user.id,
       destination_id: destination.id,
       status: 'failed',
@@ -70,13 +70,13 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     }
   }
 
-  // 5. Check if already completed
-  const { data: existingCompletion } = await supabase
+  // 4. Check if already completed
+  const { data: existingCompletion } = await serviceSupabase
     .from('student_destinations')
     .select('*')
     .eq('student_id', user.id)
     .eq('destination_id', destination.id)
-    .single()
+    .maybeSingle()
 
   if (existingCompletion) {
     return { 
@@ -84,8 +84,8 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     }
   }
 
-  // 6. Insert completion record
-  const { error: insertError } = await supabase
+  // 5. Insert completion record using serviceRole to bypass RLS restrictions
+  const { error: insertError } = await serviceSupabase
     .from('student_destinations')
     .insert({
       student_id: user.id,
@@ -96,15 +96,15 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     return { error: `Failed to register boarding completion: ${insertError.message}` }
   }
 
-  // 7. Write scan audit logs
-  await supabase.from('scan_logs').insert({
+  // 6. Write scan audit logs
+  await serviceSupabase.from('scan_logs').insert({
     student_id: user.id,
     destination_id: destination.id,
     status: 'success',
   })
 
   // Write activity log
-  await supabase.from('activity_logs').insert({
+  await serviceSupabase.from('activity_logs').insert({
     user_id: user.id,
     user_role: 'student',
     action: 'Destination Cleared',
@@ -115,12 +115,12 @@ export async function verifyQRTokenAction(token: string, expectedDestinationId?:
     },
   })
 
-  // 8. Trigger real-time passenger notification
-  await supabase.from('notifications').insert({
+  // 7. Trigger real-time passenger notification
+  await serviceSupabase.from('notifications').insert({
     user_id: user.id,
     user_role: 'student',
     title: 'Passport Stamped!',
-    message: `Verification complete: You have successfully cleared ${destination.title} (Gate ${destination.gate_number}) and earned your stamp.`,
+    message: `Verification complete: You have successfully cleared ${destination.title} (${destination.gate_number}) and earned your stamp.`,
   })
 
   revalidatePath('/dashboard')
@@ -164,7 +164,7 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
         .from('profiles')
         .select('id')
         .or(`student_id.eq.${scannedPayload},id.eq.${scannedPayload}`)
-        .single()
+        .maybeSingle()
 
       if (profileByCode) {
         studentId = profileByCode.id
@@ -183,7 +183,7 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     .from('profiles')
     .select('*')
     .eq('id', studentId)
-    .single()
+    .maybeSingle()
 
   if (!studentProfile) {
     return { error: 'Student profile record not found in system roster.' }
@@ -198,7 +198,7 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     .from('destinations')
     .select('*')
     .eq('id', destinationId)
-    .single()
+    .maybeSingle()
 
   if (!destination) {
     return { error: 'Target clearance stop / destination gate not found.' }
@@ -210,7 +210,7 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     .select('*')
     .eq('student_id', studentId)
     .eq('destination_id', destinationId)
-    .single()
+    .maybeSingle()
 
   if (existingCompletion) {
     return {
@@ -256,7 +256,7 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     user_id: studentId,
     user_role: 'student',
     title: 'Passport Stamped by Admin!',
-    message: `Verification complete: ${destination.title} (Gate ${destination.gate_number}) has been stamped into your Digital Passport by booth staff.`,
+    message: `Verification complete: ${destination.title} (${destination.gate_number}) has been stamped into your Digital Passport by booth staff.`,
   })
 
   revalidatePath('/dashboard')
@@ -276,4 +276,3 @@ export async function verifyStudentBoardingPassAction(scannedPayload: string, ad
     }
   }
 }
-

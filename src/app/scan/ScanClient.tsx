@@ -56,35 +56,54 @@ export default function ScanClient() {
         const html5QrCode = new Html5Qrcode(scannerId)
         html5QrCodeRef.current = html5QrCode
 
-        // Check list of cameras
-        const devices = await Html5Qrcode.getCameras()
-        if (devices && devices.length > 0) {
-          setCameraPermission(true)
+        const scanConfig = {
+          fps: 15,
+          qrbox: { width: 260, height: 260 },
+        }
 
-          const rearCamera = devices.find(device =>
-            device.label.toLowerCase().includes('back') ||
-            device.label.toLowerCase().includes('rear') ||
-            device.label.toLowerCase().includes('environment')
-          )
-          const cameraId = rearCamera ? rearCamera.id : devices[0].id
-
+        try {
+          // 1st Preference: 'environment' facingMode (forces main 1x rear camera on iOS Safari & Android)
           await html5QrCode.start(
-            cameraId,
-            {
-              fps: 10,
-              qrbox: { width: 250, height: 250 },
-            },
+            { facingMode: 'environment' },
+            scanConfig,
             async (decodedText) => {
               handleQRScanned(decodedText)
             },
-            () => { }
+            () => {}
           )
-        } else {
-          setCameraPermission(false)
+          if (active) setCameraPermission(true)
+        } catch (e) {
+          // Fallback: check device list if facingMode constraint fails
+          const devices = await Html5Qrcode.getCameras()
+          if (devices && devices.length > 0) {
+            if (active) setCameraPermission(true)
+
+            // Filter out 0.5x ultra-wide / wide macro cameras
+            const mainRearCamera = devices.find(d => {
+              const label = d.label.toLowerCase()
+              return (
+                (label.includes('back') || label.includes('rear') || label.includes('environment')) &&
+                !label.includes('0.5') &&
+                !label.includes('wide') &&
+                !label.includes('ultra')
+              )
+            }) || devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear')) || devices[0]
+
+            await html5QrCode.start(
+              mainRearCamera.id,
+              scanConfig,
+              async (decodedText) => {
+                handleQRScanned(decodedText)
+              },
+              () => {}
+            )
+          } else {
+            if (active) setCameraPermission(false)
+          }
         }
       } catch (err: any) {
         console.error('Camera init error:', err)
-        setCameraPermission(false)
+        if (active) setCameraPermission(false)
       }
     }
 
@@ -142,21 +161,13 @@ export default function ScanClient() {
     setErrorMsg(null)
     if (html5QrCodeRef.current && !html5QrCodeRef.current.isScanning) {
       try {
-        const devices = await html5QrCodeRef.current.constructor.getCameras()
-        if (devices && devices.length > 0) {
-          const rearCamera = devices.find((device: any) =>
-            device.label.toLowerCase().includes('back') ||
-            device.label.toLowerCase().includes('rear')
-          )
-          const cameraId = rearCamera ? rearCamera.id : devices[0].id
-
-          await html5QrCodeRef.current.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (text: string) => handleQRScanned(text),
-            () => { }
-          )
-        }
+        const scanConfig = { fps: 15, qrbox: { width: 260, height: 260 } }
+        await html5QrCodeRef.current.start(
+          { facingMode: 'environment' },
+          scanConfig,
+          (text: string) => handleQRScanned(text),
+          () => {}
+        )
       } catch (e) {
         console.error('Failed to restart camera:', e)
       }
@@ -244,7 +255,7 @@ export default function ScanClient() {
               </button>
             </form>
           ) : (
-            /* CAMERA VIEWPORT */
+            /* CAMERA VIEWPORT - Normal (Non-inverted) feed */
             <>
               {/* Target guidelines */}
               <div className="absolute inset-8 border border-[#1E4FCC]/20 pointer-events-none rounded-2xl" />
@@ -256,7 +267,7 @@ export default function ScanClient() {
               {/* Laser scanner lines */}
               <div className="laser-line animate-scan" />
 
-              <div id={scannerId} className="w-full h-full rounded-2xl overflow-hidden scale-x-[-1]" />
+              <div id={scannerId} className="w-full h-full rounded-2xl overflow-hidden" />
 
               {cameraPermission === false && (
                 <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center p-6 space-y-3 z-20">
