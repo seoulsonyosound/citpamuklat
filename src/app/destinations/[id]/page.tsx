@@ -45,14 +45,13 @@ export default async function DestinationPage({ params }: Props) {
     .eq('destination_id', id)
     .maybeSingle()
 
-  // 4. Sequential gate lock — fetch all active destinations in order
+  // 4. Sequential gate lock — fetch all active destinations sorted by gate_number
   const { data: allDestinations } = await serviceSupabase
     .from('destinations')
-    .select('id, gate_number')
+    .select('id, gate_number, title')
     .eq('status', 'active')
     .order('created_at', { ascending: true })
 
-  // Fall back to official stops order if DB is empty
   // Sort by gate_number numerically for consistent ordering
   const sortedDestinations = (allDestinations && allDestinations.length > 0)
     ? [...allDestinations].sort((a: any, b: any) => {
@@ -60,13 +59,9 @@ export default async function DestinationPage({ params }: Props) {
         const numB = parseInt((b.gate_number || '0').replace(/\D/g, ''), 10)
         return numA - numB
       })
-    : null
+    : OFFICIAL_PAMUKLAT_STOPS.map((s) => ({ id: s.id, gate_number: s.gate_number, title: s.title }))
 
-  const orderedIds = sortedDestinations
-    ? sortedDestinations.map((d: { id: string }) => d.id)
-    : OFFICIAL_PAMUKLAT_STOPS.map((s) => s.id)
-
-
+  const orderedIds = sortedDestinations.map((d: { id: string }) => d.id)
   const destIndex = orderedIds.findIndex((did: string) => did === id)
 
   // If this is NOT the first gate, verify the previous gate is completed
@@ -85,12 +80,18 @@ export default async function DestinationPage({ params }: Props) {
     }
   }
 
+  // 5. Determine the NEXT gate (if any) to show in the post-scan prompt
+  const nextDest = destIndex >= 0 && destIndex < sortedDestinations.length - 1
+    ? sortedDestinations[destIndex + 1] as { id: string; gate_number: string; title: string }
+    : null
+
   return (
     <DestinationDetailsClient
       profile={profile}
       destination={destination}
       isCompleted={!!completion}
       completionDate={completion ? completion.completion_date : null}
+      nextDestination={nextDest}
     />
   )
 }
