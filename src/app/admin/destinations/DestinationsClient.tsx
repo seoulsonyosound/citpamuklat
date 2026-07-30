@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, MapPin, ToggleLeft, ToggleRight, QrCode, X, Save, Clock, Compass, HelpCircle, ShieldAlert } from 'lucide-react'
+import { Plus, Edit2, Trash2, MapPin, QrCode, X, Clock, Compass, Search, ShieldAlert } from 'lucide-react'
 import AdminNavbar from '@/components/AdminNavbar'
 import { saveDestinationAction, deleteDestinationAction, regenerateQRAction } from '@/app/actions/destinationActions'
-import * as Icons from 'lucide-react'
 import QRCode from 'qrcode'
 
 interface Destination {
@@ -14,12 +13,14 @@ interface Destination {
   description: string
   instructions: string
   representative: string
-  stamp_image_url: string
-  destination_color: string
-  icon: string
-  status: string
+  stamp_image_url?: string
+  destination_color?: string
+  stamp_color?: string
+  icon?: string
+  status?: string
   gate_number: string
   estimated_duration: string
+  location_name?: string
 }
 
 interface Props {
@@ -29,6 +30,8 @@ interface Props {
 export default function DestinationsClient({ initialDestinations }: Props) {
   const [destinations, setDestinations] = useState<Destination[]>(initialDestinations)
   const [editingDest, setEditingDest] = useState<Partial<Destination> | null>(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   // QR Code Modal states
   const [showQRModal, setShowQRModal] = useState<boolean>(false)
@@ -41,10 +44,11 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   const [formDesc, setFormDesc] = useState('')
   const [formInstructions, setFormInstructions] = useState('')
   const [formRep, setFormRep] = useState('')
-  const [formColor, setFormColor] = useState('#2563EB')
+  const [formColor, setFormColor] = useState('#052856')
   const [formIcon, setFormIcon] = useState('MapPin')
   const [formGate, setFormGate] = useState('')
   const [formDuration, setFormDuration] = useState('')
+  const [formLocation, setFormLocation] = useState('')
   const [formStatus, setFormStatus] = useState('active')
   const [saving, setSaving] = useState(false)
 
@@ -56,10 +60,11 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       setFormDesc(dest.description || '')
       setFormInstructions(dest.instructions || '')
       setFormRep(dest.representative || '')
-      setFormColor(dest.destination_color || '#2563EB')
+      setFormColor(dest.destination_color || dest.stamp_color || '#052856')
       setFormIcon(dest.icon || 'MapPin')
       setFormGate(dest.gate_number || '')
       setFormDuration(dest.estimated_duration || '')
+      setFormLocation(dest.location_name || '')
       setFormStatus(dest.status || 'active')
     } else {
       setEditingDest({})
@@ -67,12 +72,14 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       setFormDesc('')
       setFormInstructions('1. Arrive at the booth.\n2. Complete the activity.\n3. Present your passport to scan the QR.')
       setFormRep('')
-      setFormColor('#2563EB')
+      setFormColor('#052856')
       setFormIcon('MapPin')
       setFormGate('')
       setFormDuration('')
+      setFormLocation('')
       setFormStatus('active')
     }
+    setIsFormOpen(true)
   }
 
   // Handle Save (Create/Update)
@@ -91,6 +98,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       status: formStatus,
       gateNumber: formGate,
       estimatedDuration: formDuration,
+      locationName: formLocation,
     }
 
     try {
@@ -98,23 +106,20 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       if (result.error) {
         alert(result.error)
       } else {
-        // Success
         if (result.rawToken) {
-          // Newly created: show QR immediately!
           setQrToken(result.rawToken)
           setQrModalTitle(formTitle)
           const dataUrl = await QRCode.toDataURL(result.rawToken, { width: 300, margin: 2 })
           setQrCodeUrl(dataUrl)
           setShowQRModal(true)
         }
-
-        // Reload list client side (simplified by page refresh trigger)
         window.location.reload()
       }
     } catch (err) {
       console.error(err)
     } finally {
       setSaving(false)
+      setIsFormOpen(false)
       setEditingDest(null)
     }
   }
@@ -151,390 +156,408 @@ export default function DestinationsClient({ initialDestinations }: Props) {
     }
   }
 
-  const renderIcon = (iconName: string, color: string) => {
-    const IconComponent = (Icons as any)[iconName] || Icons.MapPin
-    return <IconComponent className="h-5 w-5" style={{ color }} />
-  }
+  const filtered = destinations.filter((d) => {
+    const term = searchTerm.toLowerCase()
+    return (
+      d.title.toLowerCase().includes(term) ||
+      d.gate_number.toLowerCase().includes(term) ||
+      (d.location_name && d.location_name.toLowerCase().includes(term)) ||
+      (d.representative && d.representative.toLowerCase().includes(term))
+    )
+  })
 
   return (
-    <div className="min-h-screen bg-[#08111F] text-slate-100 flex flex-col pb-12">
+    <div className="min-h-screen bg-[#F4F6F9] text-[#0F1D36] flex flex-col pb-12">
       <AdminNavbar />
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex-1 w-full space-y-6">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex-1 w-full space-y-8">
 
         {/* Page Header */}
-        <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-5">
+        <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#E2E8F0] pb-5">
           <div>
-            <span className="bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest inline-block">
-              Gate Management Console
+            <span className="text-[10px] font-bold tracking-[0.25em] text-[#0A3A78] uppercase flex items-center gap-1.5 mb-1">
+              <Compass className="h-4 w-4 text-[#0A3A78]" /> Gate Directory & Stamp Dispatch
             </span>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1">
-              FLIGHT GATES CONTROL
+            <h2 className="text-3xl font-black text-[#052856] tracking-tight">
+              FLIGHT GATES MANAGEMENT
             </h2>
-            <p className="text-xs text-slate-400">
-              Create and edit flight gate destinations, configure stamp parameters, and manage security QR tokens.
+            <p className="text-xs text-[#475569] font-medium mt-1">
+              Create and manage Pamuklat booth stops, generate gate clearance tokens, and configure QR verification.
             </p>
           </div>
 
-          <button
-            onClick={() => openForm(null)}
-            className="w-full md:w-auto flex items-center justify-center gap-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-widest py-3 px-5 rounded-xl shadow-lg shadow-[#2563EB]/25 border border-[#60A5FA]/25 cursor-pointer transition-all duration-300"
-          >
-            <Plus className="h-4.5 w-4.5" /> Add New Gate
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => openForm(null)}
+              className="flex items-center gap-2 bg-[#052856] hover:bg-[#031D40] text-white font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-md shadow-[#052856]/20 border border-[#0A3A78] cursor-pointer"
+            >
+              <Plus className="h-4 w-4" /> Add Flight Gate
+            </button>
+          </div>
+        </section>
+
+        {/* SEARCH & FILTERS BAR */}
+        <section className="bg-white rounded-2xl p-4 shadow-sm border border-[#E2E8F0] flex flex-col sm:flex-row gap-4 justify-between items-center">
+          <div className="relative w-full sm:w-80">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#64748B]">
+              <Search className="h-4 w-4" />
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search Gate Title, Number, Location..."
+              className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] focus:ring-1 focus:ring-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 pl-10 pr-4 outline-none text-xs font-semibold transition-all"
+            />
+          </div>
+
+          <div className="text-xs font-mono text-[#64748B] font-bold uppercase">
+            Showing <strong className="text-[#052856]">{filtered.length}</strong> active flight gates
+          </div>
         </section>
 
         {/* DESTINATIONS GRID */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {destinations.map((dest) => (
+          {filtered.map((dest) => (
             <motion.div
+              layout
               key={dest.id}
-              className="glass-panel-dark rounded-3xl p-6 shadow-xl relative flex flex-col justify-between space-y-5"
+              className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-[#E2E8F0] flex flex-col justify-between group"
             >
-              {/* Card header */}
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-[#040912] rounded-xl border border-slate-800 shrink-0">
-                    {renderIcon(dest.icon, dest.destination_color)}
+              <div>
+                {/* Image Banner */}
+                <div className="relative h-44 w-full bg-[#E2E8F0] overflow-hidden">
+                  {dest.stamp_image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={dest.stamp_image_url}
+                      alt={dest.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#052856]/10 to-[#1E4FCC]/10 text-[#052856]">
+                      <MapPin className="h-10 w-10 opacity-40" />
+                    </div>
+                  )}
+
+                  {/* Gate Number Badge */}
+                  <div className="absolute top-3 left-3 bg-[#052856] text-white font-mono text-[10px] font-black uppercase px-3 py-1 rounded-xl shadow-md border border-[#0A3A78]">
+                    Gate {dest.gate_number}
                   </div>
+
+                  {/* Stamp Color Dot */}
+                  <div
+                    className="absolute top-3 right-3 w-4 h-4 rounded-full border-2 border-white shadow-md"
+                    style={{ backgroundColor: dest.destination_color || dest.stamp_color || '#052856' }}
+                    title={`Stamp Color: ${dest.destination_color || dest.stamp_color}`}
+                  />
+                </div>
+
+                {/* Content info */}
+                <div className="p-5 space-y-3">
                   <div>
-                    <h4 className="text-sm font-extrabold text-white uppercase tracking-wide truncate max-w-[150px]">
+                    <h3 className="font-extrabold text-base text-[#0F1D36] tracking-tight">
                       {dest.title}
-                    </h4>
-                    <span className="text-[9px] font-mono text-slate-500 uppercase mt-0.5 block leading-none">
-                      {dest.gate_number}
-                    </span>
+                    </h3>
+                    {dest.location_name && (
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#475569] font-bold mt-1">
+                        <MapPin className="h-3.5 w-3.5 text-[#052856] shrink-0" />
+                        <span>{dest.location_name}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-[#334155] line-clamp-2 leading-relaxed font-medium">
+                    {dest.description}
+                  </p>
+
+                  <div className="pt-2 border-t border-[#E2E8F0] grid grid-cols-2 gap-2 text-[10px] font-mono text-[#64748B] font-bold uppercase">
+                    <div>
+                      <span className="block text-[8px] text-[#94A3B8]">Est Duration</span>
+                      <span className="text-[#0F1D36] font-extrabold flex items-center gap-1"><Clock className="h-3 w-3 text-amber-600" /> {dest.estimated_duration}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[8px] text-[#94A3B8]">Representative</span>
+                      <span className="text-[#0F1D36] font-extrabold truncate block">{dest.representative}</span>
+                    </div>
                   </div>
                 </div>
-
-                <span className={`px-2 py-0.5 text-[8px] font-bold tracking-widest uppercase rounded border ${dest.status === 'active'
-                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-500/20'
-                    : 'bg-slate-950 text-slate-500 border-slate-800'
-                  }`}>
-                  {dest.status}
-                </span>
               </div>
 
-              {/* Description */}
-              <p className="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">
-                {dest.description}
-              </p>
-
-              {/* Parameters */}
-              <div className="bg-[#040912]/50 border border-slate-800 p-3 rounded-2xl grid grid-cols-2 gap-3 font-mono text-[9px] uppercase text-slate-300">
-                <div className="space-y-1">
-                  <span className="text-slate-400 block font-sans text-[8.5px] font-bold">Est Duration:</span>
-                  <span className="font-bold text-white flex items-center gap-1"><Clock className="h-3 w-3 text-amber-400" /> {dest.estimated_duration}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-slate-400 block font-sans text-[8.5px] font-bold">Representative:</span>
-                  <span className="font-bold text-white flex items-center gap-1"><Compass className="h-3 w-3 text-sky-400" /> {dest.representative}</span>
-                </div>
-              </div>
-
-              {/* Actions row */}
-              <div className="flex gap-2.5 pt-2 border-t border-slate-800">
-                <button
-                  onClick={() => openForm(dest)}
-                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-200 font-mono text-[9.5px] font-bold uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-700 cursor-pointer"
-                  title="Modify Settings"
-                >
-                  <Edit2 className="h-3.5 w-3.5 text-sky-400" /> Edit
-                </button>
+              {/* Actions Footer */}
+              <div className="p-4 bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between gap-2">
                 <button
                   onClick={() => handleRegenerateQR(dest)}
-                  className="flex-1 inline-flex items-center justify-center gap-1 bg-[#0e1b30] hover:bg-slate-800 text-slate-200 font-mono text-[9.5px] font-bold uppercase tracking-widest py-2 px-2.5 rounded-lg border border-slate-700 cursor-pointer"
-                  title="Issue New Code"
+                  className="flex items-center gap-1.5 bg-[#052856] hover:bg-[#031D40] text-white text-[10px] font-extrabold uppercase tracking-wider px-3.5 py-2 rounded-xl transition-colors shadow-sm cursor-pointer"
                 >
-                  <QrCode className="h-3.5 w-3.5 text-amber-400" /> Token
+                  <QrCode className="h-3.5 w-3.5" /> Stamp Token QR
                 </button>
-                <button
-                  onClick={() => handleDelete(dest.id)}
-                  className="bg-[#0e1b30] hover:bg-red-950/20 text-slate-300 hover:text-red-400 p-2 rounded-lg border border-slate-700 hover:border-red-500/20 cursor-pointer transition-colors"
-                  title="Delete gate"
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-red-400" />
-                </button>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => openForm(dest)}
+                    className="p-2 text-[#475569] hover:text-[#052856] hover:bg-white rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#E2E8F0]"
+                    title="Edit Gate Details"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(dest.id)}
+                    className="p-2 text-[#475569] hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-red-200"
+                    title="Delete Gate"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
 
-          {destinations.length === 0 && (
-            <div className="col-span-full text-center py-16 rounded-3xl border border-dashed border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-              No flight gates assigned. Click "Add New Gate" to generate one.
+          {filtered.length === 0 && (
+            <div className="col-span-full text-center py-16 bg-white rounded-3xl border border-[#E2E8F0] space-y-3">
+              <Compass className="h-12 w-12 text-[#64748B] mx-auto opacity-40" />
+              <p className="text-xs text-[#64748B] font-bold uppercase tracking-wider">No matching flight gates found in directory.</p>
             </div>
           )}
         </section>
 
-      </main>
-
-      {/* DRAWER DRAWER FOR ADDING/EDITING */}
-      <AnimatePresence>
-        {editingDest && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#040912]/80 backdrop-blur-sm flex justify-end"
-          >
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 20 }}
-              className="w-full max-w-lg bg-[#08111F] border-l border-slate-850 h-full p-6 md:p-8 flex flex-col justify-between shadow-2xl relative"
-            >
-
-              {/* Drawer header */}
-              <div className="flex justify-between items-center border-b border-slate-850 pb-4 mb-6">
-                <div>
-                  <span className="text-[8px] font-mono text-amber-500 uppercase tracking-widest block leading-none">
-                    Operations Configuration
-                  </span>
-                  <h4 className="text-sm font-black text-white uppercase tracking-wide mt-1">
-                    {editingDest.id ? 'Modify Flight Gate' : 'Assign New Gate'}
-                  </h4>
-                </div>
-                <button
-                  onClick={() => setEditingDest(null)}
-                  className="bg-slate-900 border border-slate-800 hover:bg-slate-800 p-2 rounded-xl text-slate-400 cursor-pointer"
-                >
-                  <X className="h-4.5 w-4.5" />
-                </button>
-              </div>
-
-              {/* Form elements scrolling wrapper */}
-              <form onSubmit={handleSave} className="flex-1 overflow-y-auto pr-1 space-y-4 pb-6">
-
-                {/* Title */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                    Destination Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder="e.g. Guidance Office, SSITE Booth"
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs"
-                  />
-                </div>
-
-                {/* Gate & Duration row */}
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Gate Number */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                      Gate Number
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formGate}
-                      onChange={(e) => setFormGate(e.target.value)}
-                      placeholder="e.g. GATE 1A"
-                      className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs"
-                    />
-                  </div>
-
-                  {/* Estimated Duration */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                      Flight Est. Duration
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formDuration}
-                      onChange={(e) => setFormDuration(e.target.value)}
-                      placeholder="e.g. 10 mins"
-                      className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs"
-                    />
-                  </div>
-                </div>
-
-                {/* Representative */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                    Assigned Officer / Rep
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formRep}
-                    onChange={(e) => setFormRep(e.target.value)}
-                    placeholder="Officer Name"
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs"
-                  />
-                </div>
-
-                {/* Description */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                    Description
-                  </label>
-                  <textarea
-                    required
-                    rows={2}
-                    value={formDesc}
-                    onChange={(e) => setFormDesc(e.target.value)}
-                    placeholder="Explain what students must do here..."
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs resize-none"
-                  />
-                </div>
-
-                {/* Step-by-step instructions */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                    Step-by-Step Boarding Instructions (One per line)
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={formInstructions}
-                    onChange={(e) => setFormInstructions(e.target.value)}
-                    placeholder="Enter steps..."
-                    className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-100 rounded-xl py-3 px-4 outline-none text-xs font-mono"
-                  />
-                </div>
-
-                {/* Color, Icon, Status row */}
-                <div className="grid grid-cols-3 gap-4">
-                  {/* Color */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                      Stamp Color
-                    </label>
-                    <input
-                      type="color"
-                      value={formColor}
-                      onChange={(e) => setFormColor(e.target.value)}
-                      className="w-full bg-transparent h-10 border border-slate-850 focus:border-[#2563EB] rounded-xl outline-none cursor-pointer p-0.5"
-                    />
-                  </div>
-
-                  {/* Icon */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                      Icon Name
-                    </label>
-                    <select
-                      value={formIcon}
-                      onChange={(e) => setFormIcon(e.target.value)}
-                      className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-350 rounded-xl h-10 px-3 outline-none text-xs cursor-pointer appearance-none"
-                    >
-                      <option value="MapPin">MapPin</option>
-                      <option value="BookOpen">BookOpen</option>
-                      <option value="Compass">Compass</option>
-                      <option value="Award">Award</option>
-                      <option value="Plane">Plane</option>
-                      <option value="ShieldCheck">ShieldCheck</option>
-                      <option value="Clock">Clock</option>
-                    </select>
-                  </div>
-
-                  {/* Status */}
-                  <div className="space-y-1.5">
-                    <label className="block text-xs uppercase tracking-widest text-slate-400 font-bold">
-                      Gate State
-                    </label>
-                    <select
-                      value={formStatus}
-                      onChange={(e) => setFormStatus(e.target.value)}
-                      className="w-full bg-[#0E1B30] border border-slate-800 focus:border-[#2563EB] text-slate-350 rounded-xl h-10 px-3 outline-none text-xs cursor-pointer appearance-none"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-
-              </form>
-
-              {/* Submit button footer */}
-              <div className="border-t border-slate-850 pt-4 flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => setEditingDest(null)}
-                  className="w-1/2 bg-[#0e1b30] hover:bg-slate-800 text-slate-400 font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl border border-slate-800 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-1/2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl border border-[#60A5FA]/20 cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Save className="h-4 w-4" /> {saving ? 'Saving...' : 'Save Gate'}
-                </button>
-              </div>
-
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* QR CODE GENERATED DISPLAY MODAL */}
-      <AnimatePresence>
-        {showQRModal && qrCodeUrl && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-55 bg-[#040912]/95 backdrop-blur-md flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="max-w-sm w-full bg-[#08111F] border border-amber-500/25 rounded-3xl p-6 md:p-8 text-center shadow-2xl relative"
-            >
-              <button
-                onClick={() => {
-                  setShowQRModal(false)
-                  setQrToken(null)
-                  setQrCodeUrl(null)
-                }}
-                className="absolute top-4 right-4 bg-slate-900 border border-slate-800 hover:bg-slate-800 p-2 rounded-xl text-slate-400 cursor-pointer"
+        {/* QR CODE TOKEN DISPLAY MODAL */}
+        <AnimatePresence>
+          {showQRModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full border border-[#E2E8F0] shadow-2xl text-center space-y-5 relative text-[#0F1D36]"
               >
-                <X className="h-4 w-4" />
-              </button>
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="absolute top-4 right-4 text-[#64748B] hover:text-[#0F1D36] p-1.5 rounded-full hover:bg-[#F1F5F9] transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
 
-              <div className="space-y-1 mb-6 text-center">
-                <span className="text-[8px] font-mono text-amber-400 bg-amber-950/40 border border-amber-500/25 px-2.5 py-0.5 rounded-full uppercase tracking-widest inline-block leading-none">
-                  Secure Scanner Token
-                </span>
-                <h4 className="text-sm font-extrabold text-white uppercase mt-1.5 truncate max-w-[200px] mx-auto">
-                  {qrModalTitle}
-                </h4>
-              </div>
-
-              {/* QR Image */}
-              <div className="bg-white p-4 rounded-2xl mx-auto inline-block shadow-inner mb-6">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrCodeUrl} alt="Secure QR Code" className="w-48 h-48 mx-auto" />
-              </div>
-
-              <div className="space-y-4">
-                <div className="text-[10px] text-slate-500 leading-normal max-w-xs mx-auto">
-                  Representatives display this QR code at their activity booth. Freshmen scan this to stamp their passports.
+                <div>
+                  <span className="text-[9px] font-mono text-[#0A3A78] font-black uppercase tracking-widest block">
+                    Official Clearance Stamp Token
+                  </span>
+                  <h3 className="text-lg font-black text-[#052856] uppercase mt-1">
+                    {qrModalTitle}
+                  </h3>
                 </div>
 
-                {/* Security Token alert */}
-                <div className="text-[9px] font-mono text-amber-500 border border-amber-500/15 bg-amber-950/20 py-2.5 px-3 rounded-xl break-all">
-                  Token: {qrToken?.substring(0, 32)}...
+                {/* QR Image Box */}
+                {qrCodeUrl && (
+                  <div className="bg-[#F8FAFC] p-4 rounded-2xl border-2 border-dashed border-[#CBD5E1] inline-block">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qrCodeUrl} alt="Secure QR Code" className="w-48 h-48 mx-auto" />
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <p className="text-[10px] text-[#475569] font-medium leading-relaxed">
+                    Representatives display this QR code at their activity booth. Freshmen scan this to stamp their passports.
+                  </p>
+
+                  {qrToken && (
+                    <div className="text-[9px] font-mono text-amber-600 border border-amber-500/20 bg-amber-50 py-2 px-3 rounded-xl break-all">
+                      Token: {qrToken.substring(0, 32)}...
+                    </div>
+                  )}
+
+                  <div className="text-[8px] font-mono text-[#64748B] uppercase tracking-widest flex items-center justify-center gap-1">
+                    <ShieldAlert className="h-3 w-3 text-amber-600" /> NOT STORED UNENCRYPTED
+                  </div>
                 </div>
 
-                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest flex items-center justify-center gap-1">
-                  <ShieldAlert className="h-3 w-3 text-amber-500" /> NOT STORED IN DATABASE UNENCRYPTED
-                </div>
-              </div>
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="w-full bg-[#052856] text-white font-extrabold text-xs uppercase py-3 rounded-xl hover:bg-[#031D40] transition-colors"
+                >
+                  Close Window
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* CREATE / EDIT GATE DRAWER SLIDE-OVER */}
+        <AnimatePresence>
+          {isFormOpen && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-sm">
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="bg-white w-full max-w-lg h-full overflow-y-auto p-6 md:p-8 border-l border-[#E2E8F0] shadow-2xl flex flex-col justify-between text-[#0F1D36]"
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4 mb-6">
+                    <div>
+                      <span className="text-[9px] font-mono text-[#0A3A78] font-black uppercase tracking-widest block">
+                        Control Tower Form
+                      </span>
+                      <h3 className="text-xl font-black text-[#052856] uppercase">
+                        {editingDest?.id ? 'Modify Flight Gate' : 'New Flight Gate Stop'}
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setIsFormOpen(false)}
+                      className="text-[#64748B] hover:text-[#0F1D36] p-2 rounded-xl hover:bg-[#F1F5F9] transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <form id="gateForm" onSubmit={handleSave} className="space-y-4 text-xs">
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                        Gate Title / Station Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formTitle}
+                        onChange={(e) => setFormTitle(e.target.value)}
+                        placeholder="e.g. IT Innovation Hub & Robotics Lab"
+                        className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                          Gate Number Code *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formGate}
+                          onChange={(e) => setFormGate(e.target.value)}
+                          placeholder="e.g. G-01"
+                          className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-mono font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                          Stamp Color (Hex Code) *
+                        </label>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="color"
+                            value={formColor}
+                            onChange={(e) => setFormColor(e.target.value)}
+                            className="h-9 w-9 rounded-lg bg-transparent border-0 cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            required
+                            value={formColor}
+                            onChange={(e) => setFormColor(e.target.value)}
+                            className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-mono font-semibold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                        Campus Physical Location *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formLocation}
+                        onChange={(e) => setFormLocation(e.target.value)}
+                        placeholder="e.g. St. Thomas Aquinas Building Room 302"
+                        className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                          Est Duration *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formDuration}
+                          onChange={(e) => setFormDuration(e.target.value)}
+                          placeholder="e.g. 15 mins"
+                          className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                          Booth Representative *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formRep}
+                          onChange={(e) => setFormRep(e.target.value)}
+                          placeholder="e.g. Prof. Dela Pena"
+                          className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                        Brief Station Description *
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={formDesc}
+                        onChange={(e) => setFormDesc(e.target.value)}
+                        placeholder="Overview of booth activities..."
+                        className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
+                        Clearance & Stamp Instructions *
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={formInstructions}
+                        onChange={(e) => setFormInstructions(e.target.value)}
+                        placeholder="Steps for student to earn stamp..."
+                        className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2.5 px-3.5 outline-none font-semibold"
+                      />
+                    </div>
+                  </form>
+                </div>
+
+                <div className="pt-6 border-t border-[#E2E8F0] flex gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsFormOpen(false)}
+                    className="w-1/3 bg-[#F1F5F9] border border-[#CBD5E1] text-[#475569] font-bold text-xs uppercase py-3 rounded-xl hover:bg-[#E2E8F0]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    form="gateForm"
+                    disabled={saving}
+                    className="w-2/3 bg-[#052856] text-white font-extrabold text-xs uppercase py-3 rounded-xl hover:bg-[#031D40] disabled:opacity-50 transition-colors shadow-md"
+                  >
+                    {saving ? 'Saving Flight Gate...' : editingDest?.id ? 'Update Gate' : 'Create Flight Gate'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+      </main>
     </div>
   )
 }
