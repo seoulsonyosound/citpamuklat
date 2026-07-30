@@ -50,7 +50,7 @@ export async function saveDestinationAction(input: DestinationInput) {
     estimated_duration: input.estimatedDuration,
   }
 
-  if (input.stampImageUrl) {
+  if (input.stampImageUrl !== undefined) {
     dataToSave.stamp_image_url = input.stampImageUrl
   }
 

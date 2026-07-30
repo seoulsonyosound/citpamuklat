@@ -87,6 +87,7 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <DestinationDetailsClient
+      key={destination.id}
       profile={profile}
       destination={destination}
       isCompleted={!!completion}

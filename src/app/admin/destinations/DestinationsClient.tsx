@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, MapPin, QrCode, X, Clock, Compass, Search, ShieldAlert, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Plus, Edit2, Trash2, MapPin, QrCode, X, Clock, Compass, Search, ShieldAlert, AlertTriangle, CheckCircle2, Upload, ImageIcon } from 'lucide-react'
 import AdminNavbar from '@/components/AdminNavbar'
 import { saveDestinationAction, deleteDestinationAction, regenerateQRAction } from '@/app/actions/destinationActions'
 import QRCode from 'qrcode'
@@ -65,7 +65,30 @@ export default function DestinationsClient({ initialDestinations }: Props) {
   const [formDuration, setFormDuration] = useState('')
   const [formLocation, setFormLocation] = useState('')
   const [formStatus, setFormStatus] = useState('active')
+  const [formStampImage, setFormStampImage] = useState('')
   const [saving, setSaving] = useState(false)
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setAlertModal({
+          isOpen: true,
+          title: 'File Too Large',
+          message: 'Please select an image smaller than 5MB.',
+          isError: true,
+        })
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setFormStampImage(event.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   // Open Drawer Form
   const openForm = (dest: Partial<Destination> | null) => {
@@ -81,6 +104,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       setFormDuration(dest.estimated_duration || '')
       setFormLocation(dest.location_name || '')
       setFormStatus(dest.status || 'active')
+      setFormStampImage(dest.stamp_image_url || '')
     } else {
       setEditingDest({})
       setFormTitle('')
@@ -93,6 +117,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       setFormDuration('')
       setFormLocation('')
       setFormStatus('active')
+      setFormStampImage('')
     }
     setIsFormOpen(true)
   }
@@ -114,6 +139,7 @@ export default function DestinationsClient({ initialDestinations }: Props) {
       gateNumber: formGate,
       estimatedDuration: formDuration,
       locationName: formLocation,
+      stampImageUrl: formStampImage,
     }
 
     try {
@@ -586,6 +612,49 @@ export default function DestinationsClient({ initialDestinations }: Props) {
                   </div>
 
                   <form id="gateForm" onSubmit={handleSave} className="space-y-4 text-xs">
+                    {/* Flight Gate Image / Banner Upload */}
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5 flex items-center justify-between">
+                        <span>Flight Gate Cover / Banner Image</span>
+                        <span className="text-[10px] text-[#64748B] font-normal normal-case">(Upload image file or URL)</span>
+                      </label>
+                      
+                      {formStampImage ? (
+                        <div className="relative rounded-2xl overflow-hidden border border-[#CBD5E1] h-36 w-full group mb-2 shadow-inner">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={formStampImage} alt="Gate cover preview" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <label className="bg-white hover:bg-slate-100 text-[#052856] text-[11px] font-extrabold px-3 py-1.5 rounded-xl cursor-pointer shadow-md transition-all">
+                              Change Image
+                              <input type="file" accept="image/*" className="hidden" onChange={handleImageFileChange} />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setFormStampImage('')}
+                              className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-extrabold px-3 py-1.5 rounded-xl shadow-md transition-all"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="border-2 border-dashed border-[#CBD5E1] hover:border-[#052856] rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-[#F8FAFC] hover:bg-[#F1F5F9] mb-2 group">
+                          <Upload className="h-6 w-6 text-[#052856] mb-1.5 opacity-70 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-black text-[#052856]">Click to upload gate image</span>
+                          <span className="text-[10px] font-medium text-[#64748B] mt-0.5">PNG, JPG, WEBP up to 5MB</span>
+                          <input type="file" accept="image/*" className="hidden" onChange={handleImageFileChange} />
+                        </label>
+                      )}
+
+                      <input
+                        type="text"
+                        value={formStampImage.startsWith('data:') ? '' : formStampImage}
+                        onChange={(e) => setFormStampImage(e.target.value)}
+                        placeholder="Or paste image URL (e.g. https://...)"
+                        className="w-full bg-[#F8FAFC] border border-[#CBD5E1] focus:border-[#052856] text-[#0F1D36] placeholder:text-[#94A3B8] rounded-xl py-2 px-3 outline-none text-[11px] font-mono"
+                      />
+                    </div>
+
                     <div>
                       <label className="block text-xs uppercase tracking-widest text-[#334155] font-extrabold mb-1.5">
                         Gate Title / Station Name *

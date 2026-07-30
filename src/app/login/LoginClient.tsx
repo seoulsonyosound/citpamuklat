@@ -8,7 +8,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { OFFICIAL_PAMUKLAT_STOPS } from '@/lib/pamuklatStops'
-import Footer from '@/components/Footer'
 
 interface Flight {
   destination: string
@@ -421,9 +420,6 @@ export default function LoginClient() {
           </div>
         </motion.div>
       </div>
-
-      {/* Global Bottom Footer with 3 Logos (SSITE -> UA -> CIT) & CANDABA GURLZ badge */}
-      <Footer />
     </div>
   )
 }

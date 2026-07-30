@@ -105,10 +105,15 @@ export default function DestinationDetailsClient({
   }
 
   useEffect(() => {
+    setLocalCompleted(isCompleted)
+    setScanError(null)
+    setManualInput(false)
+    setManualToken('')
+    setLoadingScan(false)
     if (isCompleted) {
       triggerConfetti()
     }
-  }, [isCompleted])
+  }, [destination.id, isCompleted])
 
   // Initialize html5-qrcode dynamically inside this section
   useEffect(() => {
