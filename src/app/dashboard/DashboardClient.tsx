@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -77,12 +77,83 @@ export default function DashboardClient({
   const supabase = createClient()
   const [completions, setCompletions] = useState<Completion[]>(initialCompletions)
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications)
+  const userIdRef = useRef<string | null>(null)
 
   const completedIds = completions.map((c) => c.destination_id)
   const totalDestinations = initialDestinations.length
   const completedCount = completions.length
   const remainingCount = totalDestinations - completedCount
   const completionPercent = totalDestinations > 0 ? Math.round((completedCount / totalDestinations) * 100) : 0
+
+  // Realtime subscription: refresh notifications and completions live
+  useEffect(() => {
+    let userId: string | null = null
+
+    const setup = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      userId = user.id
+      userIdRef.current = user.id
+
+      // Subscribe to new notifications for this user
+      const notifChannel = supabase
+        .channel(`dash_notifs_${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            setNotifications((prev) => [payload.new as Notification, ...prev])
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            setNotifications((prev) =>
+              prev.map((n) => (n.id === (payload.new as Notification).id ? (payload.new as Notification) : n))
+            )
+          }
+        )
+        .subscribe()
+
+      // Subscribe to new completions for this user
+      const completionChannel = supabase
+        .channel(`dash_completions_${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'student_destinations',
+            filter: `student_id=eq.${user.id}`,
+          },
+          (payload) => {
+            setCompletions((prev) => [...prev, payload.new as Completion])
+          }
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(notifChannel)
+        supabase.removeChannel(completionChannel)
+      }
+    }
+
+    const cleanup = setup()
+    return () => {
+      cleanup.then((fn) => fn && fn())
+    }
+  }, [supabase])
 
   const handleMarkAsRead = async (id: string) => {
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id)
@@ -350,9 +421,9 @@ export default function DashboardClient({
                           </div>
                         ) : (
                           <Link href={`/destinations/${dest.id}`} className="w-full">
-                            <div className="w-full flex items-center justify-center gap-1.5 bg-[#052856] hover:bg-[#031D40] text-white text-[10px] font-extrabold uppercase tracking-wider py-3 px-4 rounded-xl shadow-md shadow-[#052856]/20 border border-[#0A3A78] cursor-pointer transition-colors group">
+                            <div className="w-full flex items-center justify-center gap-2 bg-[#052856] hover:bg-[#031D40] active:bg-[#020F24] text-white text-xs font-extrabold uppercase tracking-wider py-3.5 px-4 rounded-xl shadow-md shadow-[#052856]/20 border border-[#0A3A78] cursor-pointer transition-colors group min-h-[44px]">
                               Visit Stop
-                              <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                              <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                           </Link>
                         )}

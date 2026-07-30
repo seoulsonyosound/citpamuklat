@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { signAdminToken } from '@/lib/adminAuth'
+import { createServiceRoleClient } from '@/lib/supabase/serviceRole'
 
 /**
  * Handles Admin authentication check and sets secure session cookie
@@ -89,8 +90,9 @@ export async function completeOnboardingAction(data: {
     },
   })
 
-  // Create initial notification
-  await supabase.from('notifications').insert({
+  // Create initial notification via service role to bypass RLS INSERT restrictions
+  const serviceSupabase = createServiceRoleClient()
+  await serviceSupabase.from('notifications').insert({
     user_id: user.id,
     user_role: 'student',
     title: 'Passport Issued',

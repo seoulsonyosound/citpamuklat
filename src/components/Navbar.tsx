@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Plane, Compass, CreditCard, ScanLine, Clock, LogOut, Bell } from 'lucide-react'
+import { Plane, Compass, CreditCard, ScanLine, LogOut, Bell } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export default function Navbar() {
@@ -26,7 +26,7 @@ export default function Navbar() {
           .single()
         setProfile(data)
 
-        // Load notifications count
+        // Load unread notifications count
         const { count } = await supabase
           .from('notifications')
           .select('*', { count: 'exact', head: true })
@@ -61,42 +61,43 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { name: 'Terminal Dashboard', href: '/dashboard', icon: Compass },
-    { name: 'Digital Passport', href: '/passport', icon: CreditCard },
-    { name: 'Boarding Scanner', href: '/scan', icon: ScanLine },
+    { name: 'Dashboard', href: '/dashboard', icon: Compass },
+    { name: 'Passport', href: '/passport', icon: CreditCard },
+    { name: 'Scanner', href: '/scan', icon: ScanLine },
   ]
 
   return (
-    <header className="w-full bg-white/95 border-b border-[#E2E2E0] backdrop-blur-md sticky top-0 z-40 px-3 sm:px-6 md:px-8 py-3 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="w-full bg-white border-b border-[#E2E8F0] sticky top-0 z-40 shadow-sm">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 flex items-center justify-between h-14 sm:h-16">
+        
         {/* Brand Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer group">
+        <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer group shrink-0">
           <div className="bg-[#052856]/10 border border-[#052856]/20 p-2 rounded-xl text-[#052856] group-hover:bg-[#052856]/20 transition-all">
             <Plane className="h-5 w-5 transform -rotate-45" />
           </div>
-          <div className="hidden xs:block sm:block">
+          <div className="hidden sm:block">
             <span className="text-[8.5px] font-extrabold tracking-[0.25em] text-[#0A3A78] uppercase block leading-none">
               University Terminal
             </span>
-            <span className="font-black text-xs sm:text-sm text-[#052856] tracking-wide">
+            <span className="font-black text-sm text-[#052856] tracking-wide">
               CIT PASSPORT
             </span>
           </div>
         </Link>
 
-        {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1 sm:gap-2 bg-[#F4F4F2] border border-[#E2E2E0] p-1 rounded-2xl">
+        {/* Navigation Tabs — larger tap targets on mobile */}
+        <nav className="flex items-center gap-0.5 sm:gap-1 bg-[#F4F6F9] border border-[#E2E8F0] p-1 rounded-2xl">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href
+            const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
             const LinkIcon = link.icon
 
             return (
               <Link key={link.href} href={link.href}>
                 <div
-                  className={`relative flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  className={`relative flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-extrabold uppercase tracking-wide transition-all duration-300 cursor-pointer min-w-[44px] min-h-[36px] justify-center ${
                     isActive
                       ? 'text-white'
-                      : 'text-[#3B4E6B] font-extrabold hover:text-[#052856]'
+                      : 'text-[#334155] hover:text-[#052856] hover:bg-white/50'
                   }`}
                 >
                   {isActive && (
@@ -106,56 +107,59 @@ export default function Navbar() {
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 relative z-10" />
-                  <span className="hidden sm:inline md:inline relative z-10">{link.name}</span>
+                  <LinkIcon className="h-4 w-4 sm:h-4 sm:w-4 shrink-0 relative z-10" />
+                  <span className="hidden sm:inline relative z-10 text-xs">{link.name}</span>
                 </div>
               </Link>
             )
           })}
         </nav>
 
-        {/* User profile dropdown & Logout */}
-        <div className="flex items-center gap-2 sm:gap-3.5">
-          {/* Notifications bell */}
-          <Link href="/dashboard#notifications" className="relative cursor-pointer hover:text-[#052856] text-[#3B4E6B] transition-colors p-1.5 font-bold">
+        {/* Right Side: Notifications + Profile + Logout */}
+        <div className="flex items-center gap-1 sm:gap-3">
+          {/* Notifications bell — larger tap target */}
+          <Link
+            href="/dashboard#notifications"
+            className="relative cursor-pointer text-[#334155] hover:text-[#052856] transition-colors p-2 rounded-xl hover:bg-[#F4F6F9] min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#861211] text-white font-mono font-black text-[9px] px-1.5 py-0.2 rounded-full border-2 border-white">
-                {unreadCount}
+              <span className="absolute top-1 right-1 bg-red-600 text-white font-black text-[9px] min-w-[16px] h-4 px-1 rounded-full border-2 border-white flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </Link>
 
           {/* User Profile Info */}
           {profile && (
-            <div className="flex items-center gap-2 border-l border-[#E2E2E0] pl-2 sm:pl-3">
+            <div className="hidden sm:flex items-center gap-2 border-l border-[#E2E8F0] pl-3">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={profile.avatar_url}
                   alt={profile.full_name}
-                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-full object-cover border border-[#052856]/30"
+                  className="h-8 w-8 rounded-full object-cover border border-[#052856]/30 shrink-0"
                 />
               ) : (
-                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#052856] text-white flex items-center justify-center font-extrabold text-xs uppercase border border-[#052856]/30">
-                  {profile.full_name[0]}
+                <div className="h-8 w-8 rounded-full bg-[#052856] text-white flex items-center justify-center font-extrabold text-xs uppercase border border-[#052856]/30 shrink-0">
+                  {profile.full_name?.[0] || 'S'}
                 </div>
               )}
               <div className="hidden lg:block text-left">
-                <span className="text-[10px] font-black text-[#052856] block max-w-[100px] truncate">
+                <span className="text-[10px] font-black text-[#052856] block max-w-[110px] truncate">
                   {profile.full_name}
                 </span>
-                <span className="text-[8.5px] font-extrabold text-[#3B4E6B] block uppercase truncate max-w-[100px]">
+                <span className="text-[8.5px] font-extrabold text-[#475569] block uppercase truncate max-w-[110px]">
                   {profile.course ? profile.course.split(' ')[0] : 'Freshman'}
                 </span>
               </div>
             </div>
           )}
 
-          {/* Exit Logout */}
+          {/* Logout Button — larger tap target */}
           <button
             onClick={handleLogout}
-            className="bg-[#F4F4F2] border border-[#E2E2E0] hover:bg-[#861211]/10 hover:border-[#861211]/30 hover:text-[#861211] p-2 rounded-xl text-[#3B4E6B] transition-all cursor-pointer font-bold"
+            className="bg-[#F4F6F9] border border-[#E2E8F0] hover:bg-red-50 hover:border-red-200 hover:text-red-600 p-2.5 rounded-xl text-[#475569] transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
             title="Log Out Terminal"
           >
             <LogOut className="h-4 w-4" />
